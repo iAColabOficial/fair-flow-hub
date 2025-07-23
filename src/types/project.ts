@@ -25,16 +25,15 @@ export interface Project {
 }
 
 export enum ProjectCategory {
-  CATEGORY_I = 'CATEGORY_I', // Educação Infantil (Pré I e Pré II)
-  CATEGORY_II_A = 'CATEGORY_II_A', // Ensino Fundamental – 1º ao 3º ano
-  CATEGORY_II_B = 'CATEGORY_II_B', // Ensino Fundamental – 4º ao 6º ano
-  CATEGORY_III = 'CATEGORY_III', // Ensino Fundamental – 7º ao 9º ano
-  CATEGORY_IV = 'CATEGORY_IV', // Ensino Técnico subsequente
-  CATEGORY_V = 'CATEGORY_V', // Educação de Jovens e Adultos
-  CATEGORY_VI = 'CATEGORY_VI', // Ensino Médio e/ou Profissionalizante
-  CATEGORY_VII = 'CATEGORY_VII', // Ensino Superior
-  CATEGORY_VIII = 'CATEGORY_VIII', // Pós-graduação
-  EXPERIENCE_REPORT = 'EXPERIENCE_REPORT' // Relato de Experiência Científico-Pedagógica
+  CATEGORY_I = 'I', // Educação infantil (pré-escolar)
+  CATEGORY_II = 'II', // Estudantes do Ensino Fundamental (1º ao 3º ano)
+  CATEGORY_III = 'III', // Estudantes do Ensino Fundamental (4º ao 6º ano)
+  CATEGORY_IV = 'IV', // Estudantes do Ensino Fundamental (7º ao 9º ano)
+  CATEGORY_V = 'V', // Ensino médio e/ou técnico profissionalizante concomitante
+  CATEGORY_VI = 'VI', // Cursos técnicos pós médio
+  CATEGORY_VII = 'VII', // Educação de Jovens e adultos
+  CATEGORY_VIII = 'VIII', // Ensino superior
+  CATEGORY_IX = 'IX' // Pós Graduações
 }
 
 export enum KnowledgeArea {

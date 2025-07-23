@@ -33,7 +33,7 @@ export const SUBMISSION_CRITERIA: EvaluationCriteria[] = [
     ]
   },
   {
-    category: ProjectCategory.CATEGORY_II_A,
+    category: ProjectCategory.CATEGORY_II,
     stage: ProjectStage.SUBMISSION,
     criteria: [
       {

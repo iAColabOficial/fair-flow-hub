@@ -35,16 +35,15 @@ interface ProjectSubmissionForm {
 }
 
 const categoryLabels = {
-  [ProjectCategory.CATEGORY_I]: 'Categoria I - Educação Infantil (Pré I e Pré II)',
-  [ProjectCategory.CATEGORY_II_A]: 'Categoria II-A - Ensino Fundamental (1º ao 3º ano)',
-  [ProjectCategory.CATEGORY_II_B]: 'Categoria II-B - Ensino Fundamental (4º ao 6º ano)',
-  [ProjectCategory.CATEGORY_III]: 'Categoria III - Ensino Fundamental (7º ao 9º ano)',
-  [ProjectCategory.CATEGORY_IV]: 'Categoria IV - Ensino Técnico Subsequente',
-  [ProjectCategory.CATEGORY_V]: 'Categoria V - Educação de Jovens e Adultos',
-  [ProjectCategory.CATEGORY_VI]: 'Categoria VI - Ensino Médio e/ou Profissionalizante',
-  [ProjectCategory.CATEGORY_VII]: 'Categoria VII - Ensino Superior',
-  [ProjectCategory.CATEGORY_VIII]: 'Categoria VIII - Pós-graduação',
-  [ProjectCategory.EXPERIENCE_REPORT]: 'Relato de Experiência Científico-Pedagógica'
+  [ProjectCategory.CATEGORY_I]: 'Categoria I - Educação infantil (pré-escolar)',
+  [ProjectCategory.CATEGORY_II]: 'Categoria II - Estudantes do Ensino Fundamental (1º ao 3º ano)',
+  [ProjectCategory.CATEGORY_III]: 'Categoria III - Estudantes do Ensino Fundamental (4º ao 6º ano)',
+  [ProjectCategory.CATEGORY_IV]: 'Categoria IV - Estudantes do Ensino Fundamental (7º ao 9º ano)',
+  [ProjectCategory.CATEGORY_V]: 'Categoria V - Ensino médio e/ou técnico profissionalizante concomitante',
+  [ProjectCategory.CATEGORY_VI]: 'Categoria VI - Cursos técnicos pós médio',
+  [ProjectCategory.CATEGORY_VII]: 'Categoria VII - Educação de Jovens e adultos',
+  [ProjectCategory.CATEGORY_VIII]: 'Categoria VIII - Ensino superior',
+  [ProjectCategory.CATEGORY_IX]: 'Categoria IX - Pós Graduações'
 };
 
 const areaLabels = {

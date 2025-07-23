@@ -188,7 +188,7 @@ export const CATEGORY_AWARDS: Award[] = [
     name: '1º Lugar - Categoria II-A',
     description: 'Primeiro lugar da Categoria II-A - Ensino Fundamental 1º ao 3º ano',
     type: AwardType.CATEGORY_WINNER,
-    category: ProjectCategory.CATEGORY_II_A,
+    category: ProjectCategory.CATEGORY_II,
     criteria: 'Melhor projeto da Categoria II-A'
   },
   {
@@ -196,7 +196,7 @@ export const CATEGORY_AWARDS: Award[] = [
     name: '1º Lugar - Categoria II-B',
     description: 'Primeiro lugar da Categoria II-B - Ensino Fundamental 4º ao 6º ano',
     type: AwardType.CATEGORY_WINNER,
-    category: ProjectCategory.CATEGORY_II_B,
+    category: ProjectCategory.CATEGORY_III,
     criteria: 'Melhor projeto da Categoria II-B'
   },
   {
