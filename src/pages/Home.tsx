@@ -8,33 +8,33 @@ const Home = () => {
   const features = [
     {
       icon: Users,
-      title: "User Management",
-      description: "Complete registration, approval and role-based permission system"
+      title: "Gestão de Usuários",
+      description: "Sistema completo de registro, aprovação e permissões baseadas em funções"
     },
     {
       icon: BookOpen,
-      title: "Project System",
-      description: "End-to-end project creation, documentation and submission tracking"
+      title: "Sistema de Projetos",
+      description: "Criação, documentação e acompanhamento de submissões de projetos de ponta a ponta"
     },
     {
       icon: Award,
-      title: "Evaluation System",
-      description: "Automated distribution and comprehensive grading interface"
+      title: "Sistema de Avaliação",
+      description: "Distribuição automatizada e interface abrangente de avaliação"
     },
     {
       icon: TrendingUp,
-      title: "Financial Integration",
-      description: "ASAAS payment integration with automatic billing and reports"
+      title: "Integração Financeira",
+      description: "Integração com ASAAS para pagamentos automáticos e relatórios"
     },
     {
       icon: Shield,
-      title: "Security & Audit",
-      description: "Complete audit logs and secure permission management"
+      title: "Segurança e Auditoria",
+      description: "Logs completos de auditoria e gestão segura de permissões"
     },
     {
       icon: Clock,
-      title: "Real-time Updates",
-      description: "Live notifications and communication throughout the fair cycle"
+      title: "Atualizações em Tempo Real",
+      description: "Notificações ao vivo e comunicação durante todo o ciclo da feira"
     }
   ];
 
@@ -49,16 +49,16 @@ const Home = () => {
             </div>
             <div>
               <h1 className="text-lg font-bold text-foreground">FEBIC</h1>
-              <p className="text-xs text-muted-foreground">Science Fair Platform</p>
+              <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
-              <Link to="/auth/login">Login</Link>
+              <Link to="/auth/login">Entrar</Link>
             </Button>
             <Button variant="gradient" asChild>
-              <Link to="/auth/register">Get Started</Link>
+              <Link to="/auth/register">Começar</Link>
             </Button>
           </div>
         </div>
@@ -68,27 +68,27 @@ const Home = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center">
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
-            Complete Science Fair Management
+            Gestão Completa de Feira de Ciências
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Manage Your Science Fair
+            Gerencie Sua Feira de Ciências
             <br />
-            From Start to Finish
+            Do Início ao Fim
           </h1>
           
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Complete web-based platform to manage the entire science fair cycle - from registration and project submission to evaluation and awards ceremony.
+            Plataforma web completa para gerenciar todo o ciclo da feira de ciências - desde o registro e submissão de projetos até a avaliação e cerimônia de premiação.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="gradient" asChild>
               <Link to="/auth/register" className="flex items-center gap-2">
-                Start Your Fair <ArrowRight className="w-4 h-4" />
+                Iniciar Sua Feira <ArrowRight className="w-4 h-4" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/auth/login">Access Dashboard</Link>
+              <Link to="/auth/login">Acessar Painel</Link>
             </Button>
           </div>
         </div>
@@ -99,10 +99,10 @@ const Home = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              Everything You Need
+              Tudo Que Você Precisa
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive tools and features designed specifically for science fair management
+              Ferramentas e recursos abrangentes projetados especificamente para gestão de feiras de ciências
             </p>
           </div>
 
@@ -132,21 +132,21 @@ const Home = () => {
           <Card className="bg-gradient-hero border-0 text-center p-12">
             <CardHeader>
               <CardTitle className="text-3xl font-bold text-primary-foreground mb-4">
-                Ready to Transform Your Science Fair?
+                Pronto Para Transformar Sua Feira de Ciências?
               </CardTitle>
               <CardDescription className="text-lg text-primary-foreground/80 max-w-2xl mx-auto">
-                Join thousands of educators and administrators who trust FEBIC to manage their science fairs efficiently and professionally.
+                Junte-se a milhares de educadores e administradores que confiam na FEBIC para gerenciar suas feiras de ciências de forma eficiente e profissional.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
                   <Link to="/auth/register" className="flex items-center gap-2">
-                    Create Account <ArrowRight className="w-4 h-4" />
+                    Criar Conta <ArrowRight className="w-4 h-4" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20" asChild>
-                  <Link to="/auth/login">Sign In</Link>
+                  <Link to="/auth/login">Entrar</Link>
                 </Button>
               </div>
             </CardContent>
@@ -164,7 +164,7 @@ const Home = () => {
             <span className="text-lg font-bold text-foreground">FEBIC</span>
           </div>
           <p className="text-muted-foreground">
-            © 2024 FEBIC. All rights reserved. Science Fair Management Platform.
+            © 2025 FEBIC. Todos os direitos reservados. Plataforma de Gestão de Feira de Ciências.
           </p>
         </div>
       </footer>

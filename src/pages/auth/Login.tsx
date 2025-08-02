@@ -31,26 +31,26 @@ const Login = () => {
           </div>
           <div className="text-center">
             <h1 className="text-xl font-bold text-foreground">FEBIC</h1>
-            <p className="text-xs text-muted-foreground">Science Fair Platform</p>
+            <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
           </div>
         </div>
 
         {/* Login Form */}
         <Card className="shadow-elegant">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl">Bem-vindo de Volta</CardTitle>
             <CardDescription>
-              Sign in to access your FEBIC dashboard
+              Entre para acessar seu painel FEBIC
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Endereço de Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder="seu.email@exemplo.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -58,12 +58,12 @@ const Login = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Digite sua senha"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
@@ -89,20 +89,20 @@ const Login = () => {
                   to="/auth/forgot-password"
                   className="text-primary hover:underline"
                 >
-                  Forgot password?
+                  Esqueceu a senha?
                 </Link>
               </div>
 
               <Button type="submit" className="w-full" variant="gradient">
-                Sign In
+                Entrar
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                Não tem uma conta?{" "}
                 <Link to="/auth/register" className="text-primary font-medium hover:underline">
-                  Create account
+                  Criar conta
                 </Link>
               </p>
             </div>
@@ -113,7 +113,7 @@ const Login = () => {
         <Button variant="ghost" className="w-full" asChild>
           <Link to="/" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            Back to Home
+            Voltar ao Início
           </Link>
         </Button>
       </div>
