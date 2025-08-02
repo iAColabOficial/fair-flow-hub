@@ -25,48 +25,6 @@ const roleOptions: { value: FebicRole; label: string; description: string; needs
     description: 'Orienta projetos de estudantes',
     needsApproval: false 
   },
-  { 
-    value: 'coorientador', 
-    label: 'Coorientador', 
-    description: 'Auxilia na orientação de projetos',
-    needsApproval: false 
-  },
-  { 
-    value: 'avaliador', 
-    label: 'Avaliador', 
-    description: 'Avalia projetos submetidos (requer aprovação)',
-    needsApproval: true 
-  },
-  { 
-    value: 'admin_staff', 
-    label: 'Administrador', 
-    description: 'Gerencia o sistema (requer aprovação)',
-    needsApproval: true 
-  },
-  { 
-    value: 'coordenador', 
-    label: 'Coordenador', 
-    description: 'Coordena atividades da feira (requer aprovação)',
-    needsApproval: true 
-  },
-  { 
-    value: 'financeiro', 
-    label: 'Financeiro', 
-    description: 'Gerencia aspectos financeiros (requer aprovação)',
-    needsApproval: true 
-  },
-  { 
-    value: 'feira_afiliada', 
-    label: 'Feira Afiliada', 
-    description: 'Representa feira afiliada (requer aprovação)',
-    needsApproval: true 
-  },
-  { 
-    value: 'voluntario', 
-    label: 'Voluntário', 
-    description: 'Participa como voluntário (requer aprovação)',
-    needsApproval: true 
-  },
 ];
 
 const Register = () => {

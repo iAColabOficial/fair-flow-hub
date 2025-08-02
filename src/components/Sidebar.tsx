@@ -13,7 +13,8 @@ import {
   Calendar,
   FileText,
   Home,
-  ChevronRight
+  ChevronRight,
+  UserPlus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
@@ -39,8 +40,15 @@ export const Sidebar = ({ className }: SidebarProps) => {
       name: "Gestão de Usuários",
       icon: Users,
       href: "/users",
-      current: location.pathname.startsWith("/users"),
+      current: location.pathname === "/users",
       badge: "12",
+      show: canManageUsers,
+    },
+    {
+      name: "Atribuir Cargos",
+      icon: UserPlus,
+      href: "/assign-roles",
+      current: location.pathname === "/assign-roles",
       show: canManageUsers,
     },
     {

@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
+import AssignRolesPage from "./pages/AssignRolesPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/NotFound";
@@ -34,9 +35,14 @@ const App = () => (
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/users/*" element={
+            <Route path="/users" element={
               <ProtectedRoute>
                 <UsersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/assign-roles" element={
+              <ProtectedRoute>
+                <AssignRolesPage />
               </ProtectedRoute>
             } />
             <Route path="/projects/*" element={
