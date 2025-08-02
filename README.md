@@ -1,4 +1,4 @@
-# Welcome to your Lovable project in VPS Hostinger
+# Welcome to your Lovable project in VPS
 
 ## Project info
 
