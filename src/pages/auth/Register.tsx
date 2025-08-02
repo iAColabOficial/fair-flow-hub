@@ -1,228 +1,313 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Eye, EyeOff, ArrowLeft, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthLayout } from "./AuthLayout";
+
+type FebicRole = 'autor' | 'orientador' | 'coorientador' | 'avaliador' | 'admin_staff' | 'coordenador_admin' | 'coordenador' | 'diretor' | 'financeiro' | 'feira_afiliada' | 'voluntario';
+
+const roleOptions: { value: FebicRole; label: string; description: string; needsApproval: boolean }[] = [
+  { 
+    value: 'autor', 
+    label: 'Autor/Estudante', 
+    description: 'Submete projetos científicos para a feira',
+    needsApproval: false 
+  },
+  { 
+    value: 'orientador', 
+    label: 'Orientador/Professor', 
+    description: 'Orienta projetos de estudantes',
+    needsApproval: false 
+  },
+  { 
+    value: 'coorientador', 
+    label: 'Coorientador', 
+    description: 'Auxilia na orientação de projetos',
+    needsApproval: false 
+  },
+  { 
+    value: 'avaliador', 
+    label: 'Avaliador', 
+    description: 'Avalia projetos submetidos (requer aprovação)',
+    needsApproval: true 
+  },
+  { 
+    value: 'admin_staff', 
+    label: 'Administrador', 
+    description: 'Gerencia o sistema (requer aprovação)',
+    needsApproval: true 
+  },
+  { 
+    value: 'coordenador', 
+    label: 'Coordenador', 
+    description: 'Coordena atividades da feira (requer aprovação)',
+    needsApproval: true 
+  },
+  { 
+    value: 'financeiro', 
+    label: 'Financeiro', 
+    description: 'Gerencia aspectos financeiros (requer aprovação)',
+    needsApproval: true 
+  },
+  { 
+    value: 'feira_afiliada', 
+    label: 'Feira Afiliada', 
+    description: 'Representa feira afiliada (requer aprovação)',
+    needsApproval: true 
+  },
+  { 
+    value: 'voluntario', 
+    label: 'Voluntário', 
+    description: 'Participa como voluntário (requer aprovação)',
+    needsApproval: true 
+  },
+];
 
 const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    institution: "",
-    role: "",
-    agreeToTerms: false
+    cpf: "",
+    phone: "",
+    instituicao: "",
+    role: "" as FebicRole | "",
   });
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { signUp, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement actual registration
-    // For now, just navigate to login
-    navigate("/auth/login");
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert("As senhas não coincidem");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      alert("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+
+    if (!formData.role) {
+      alert("Selecione um tipo de usuário");
+      return;
+    }
+
+    await signUp(formData.email, formData.password, {
+      fullName: formData.fullName,
+      cpf: formData.cpf,
+      phone: formData.phone,
+      instituicao: formData.instituicao,
+      role: formData.role,
+    });
+  };
+
+  const selectedRole = roleOptions.find(role => role.value === formData.role);
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 justify-center">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">F</span>
-          </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold text-foreground">FEBIC</h1>
-            <p className="text-xs text-muted-foreground">Science Fair Platform</p>
-          </div>
-        </div>
+    <AuthLayout>
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold">Criar Conta</CardTitle>
+          <CardDescription>
+            Cadastre-se para participar da FEBIC
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Nome Completo</Label>
+              <Input
+                id="fullName"
+                name="fullName"
+                type="text"
+                placeholder="Seu nome completo"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-        {/* Registration Form */}
-        <Card className="shadow-elegant">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Account</CardTitle>
-            <CardDescription>
-              Join FEBIC to manage your science fair projects
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    placeholder="John"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    placeholder="Doe"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="cpf">CPF</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="your.email@institution.edu"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  id="cpf"
+                  name="cpf"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={formData.cpf}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="institution">Institution</Label>
+                <Label htmlFor="phone">Telefone</Label>
                 <Input
-                  id="institution"
-                  placeholder="Your School or Organization"
-                  value={formData.institution}
-                  onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="(11) 99999-9999"
+                  value={formData.phone}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="teacher">Teacher</SelectItem>
-                    <SelectItem value="coordinator">Fair Coordinator</SelectItem>
-                    <SelectItem value="administrator">Administrator</SelectItem>
-                    <SelectItem value="judge">Judge</SelectItem>
-                    <SelectItem value="student">Student</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="instituicao">Instituição</Label>
+              <Input
+                id="instituicao"
+                name="instituicao"
+                type="text"
+                placeholder="Escola, Universidade ou Instituição"
+                value={formData.instituicao}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a strong password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Tipo de Usuário</Label>
+              <Select value={formData.role} onValueChange={(value: FebicRole) => setFormData(prev => ({ ...prev, role: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione seu tipo de usuário" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{role.label}</span>
+                        <span className="text-xs text-muted-foreground">{role.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedRole && selectedRole.needsApproval && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Este tipo de usuário requer aprovação do administrador antes de ter acesso completo ao sistema.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={formData.agreeToTerms}
-                  onCheckedChange={(checked) => 
-                    setFormData({ ...formData, agreeToTerms: checked as boolean })
-                  }
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mínimo 6 caracteres"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
                 />
-                <label
-                  htmlFor="terms"
-                  className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
                 >
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-primary hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link to="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </label>
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
               </div>
+            </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                variant="gradient"
-                disabled={!formData.agreeToTerms}
-              >
-                Create Account
-              </Button>
-            </form>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Digite a senha novamente"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
 
-            <div className="mt-6 text-center">
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Criando conta..." : "Criar Conta"}
+            </Button>
+
+            <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link to="/auth/login" className="text-primary font-medium hover:underline">
-                  Sign in
+                Já tem uma conta?{" "}
+                <Link to="/auth/login" className="text-primary hover:underline font-medium">
+                  Faça login aqui
                 </Link>
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </form>
+        </CardContent>
+      </Card>
 
-        {/* Back to Home */}
-        <Button variant="ghost" className="w-full" asChild>
-          <Link to="/" className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-        </Button>
+      <div className="text-center">
+        <Link 
+          to="/" 
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar ao início
+        </Link>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 

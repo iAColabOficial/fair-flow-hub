@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type FebicRole = 'autor' | 'orientador' | 'avaliador' | 'admin_staff' | 'coordenador_admin' | 'diretor' | 'financeiro' | 'feira_afiliada';
+export type FebicRole = 'autor' | 'orientador' | 'coorientador' | 'avaliador' | 'admin_staff' | 'coordenador_admin' | 'coordenador' | 'diretor' | 'financeiro' | 'feira_afiliada' | 'voluntario';
 
 export interface UserRole {
   id: string;
@@ -26,13 +26,24 @@ export const useUserRole = () => {
         .from('user_roles')
         .select('*')
         .eq('user_id', user.id)
-        .eq('status', 'ativo')
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      
+      if (!data) return null;
+      
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        role: data.role as FebicRole,
+        status: data.status as 'pendente' | 'ativo' | 'inativo',
+        created_at: data.created_at,
+        approved_at: data.approved_at,
+        approved_by: data.approved_by,
+        notes: data.notes,
+      };
     },
     enabled: true,
   });
@@ -51,8 +62,10 @@ export const useUserPermissions = () => {
   const isEvaluator = () => hasRole('avaliador');
   const isFinancial = () => hasRole('financeiro');
   const isAuthor = () => hasRole('autor');
-  const isAdvisor = () => hasRole('orientador');
+  const isAdvisor = () => hasRole(['orientador', 'coorientador']);
+  const isCoordinator = () => hasRole('coordenador');
   const isFairAffiliate = () => hasRole('feira_afiliada');
+  const isVolunteer = () => hasRole('voluntario');
 
   const canManageUsers = () => isAdmin();
   const canManageProjects = () => isAdmin() || isAuthor() || isAdvisor();
@@ -69,7 +82,9 @@ export const useUserPermissions = () => {
     isFinancial,
     isAuthor,
     isAdvisor,
+    isCoordinator,
     isFairAffiliate,
+    isVolunteer,
     canManageUsers,
     canManageProjects,
     canEvaluate,
