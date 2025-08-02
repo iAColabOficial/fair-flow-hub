@@ -123,6 +123,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             cpf: userData.cpf,
             phone: userData.phone,
             instituicao: userData.instituicao,
+            role: userData.role,
           }
         }
       });
@@ -132,6 +133,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           toast.error('Este email já está cadastrado. Faça login.');
         } else if (error.message.includes('Password should be')) {
           toast.error('A senha deve ter pelo menos 6 caracteres.');
+        } else if (error.message.includes('CPF já cadastrado')) {
+          toast.error('Este CPF já está cadastrado no sistema.');
+        } else if (error.message.includes('unique_violation')) {
+          toast.error('Email ou CPF já cadastrado no sistema.');
         } else {
           toast.error(error.message);
         }
@@ -139,12 +144,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (data.user) {
-        toast.success('Cadastro realizado! Verifique seu email para confirmar a conta.');
+        toast.success('Cadastro realizado com sucesso! Verifique seu email para confirmar a conta.');
       }
 
       return { error: null };
     } catch (error: any) {
-      toast.error('Erro inesperado. Tente novamente.');
+      if (error.message?.includes('CPF já cadastrado')) {
+        toast.error('Este CPF já está cadastrado no sistema.');
+      } else if (error.message?.includes('unique_violation')) {
+        toast.error('Email ou CPF já cadastrado no sistema.');
+      } else {
+        toast.error('Erro inesperado. Tente novamente.');
+      }
       return { error };
     } finally {
       setLoading(false);
