@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import UsersPage from "./pages/UsersPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/NotFound";
@@ -35,7 +36,7 @@ const App = () => (
             } />
             <Route path="/users/*" element={
               <ProtectedRoute>
-                <Dashboard />
+                <UsersPage />
               </ProtectedRoute>
             } />
             <Route path="/projects/*" element={

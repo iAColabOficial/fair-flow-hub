@@ -16,90 +16,106 @@ import {
   ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link, useLocation } from "react-router-dom";
+import { useUserPermissions } from "@/hooks/useUserRole";
 
 interface SidebarProps {
   className?: string;
 }
 
-const navigation = [
-  {
-    name: "Painel",
-    icon: Home,
-    href: "/",
-    current: true,
-  },
-  {
-    name: "Gestão de Usuários",
-    icon: Users,
-    href: "/users",
-    current: false,
-    badge: "12",
-  },
-  {
-    name: "Projetos",
-    icon: FlaskConical,
-    href: "/projects",
-    current: false,
-    badge: "45",
-  },
-  {
-    name: "Avaliações",
-    icon: ClipboardCheck,
-    href: "/evaluations",
-    current: false,
-    badge: "8",
-  },
-  {
-    name: "Financeiro",
-    icon: CreditCard,
-    href: "/financial",
-    current: false,
-  },
-  {
-    name: "Comunicação",
-    icon: MessageSquare,
-    href: "/communication",
-    current: false,
-  },
-  {
-    name: "Eventos",
-    icon: Calendar,
-    href: "/events",
-    current: false,
-  },
-  {
-    name: "Relatórios",
-    icon: BarChart3,
-    href: "/reports",
-    current: false,
-  },
-  {
-    name: "Certificados",
-    icon: Award,
-    href: "/certificates",
-    current: false,
-  },
-];
-
-const quickActions = [
-  {
-    name: "Novo Projeto",
-    icon: FlaskConical,
-    href: "/projects/new",
-  },
-  {
-    name: "Adicionar Usuário",
-    icon: Users,
-    href: "/users/new",
-  },
-  {
-    name: "Criar Evento",
-    icon: Calendar,
-    href: "/events/new",
-  },
-];
-
 export const Sidebar = ({ className }: SidebarProps) => {
+  const location = useLocation();
+  const { canManageUsers, canManageProjects, canEvaluate, canManageFinancial, canViewReports } = useUserPermissions();
+
+  const navigation = [
+    {
+      name: "Painel",
+      icon: Home,
+      href: "/dashboard",
+      current: location.pathname === "/dashboard",
+      show: true,
+    },
+    {
+      name: "Gestão de Usuários",
+      icon: Users,
+      href: "/users",
+      current: location.pathname.startsWith("/users"),
+      badge: "12",
+      show: canManageUsers,
+    },
+    {
+      name: "Projetos",
+      icon: FlaskConical,
+      href: "/projects",
+      current: location.pathname.startsWith("/projects"),
+      badge: "45",
+      show: canManageProjects,
+    },
+    {
+      name: "Avaliações",
+      icon: ClipboardCheck,
+      href: "/evaluations",
+      current: location.pathname.startsWith("/evaluations"),
+      badge: "8",
+      show: canEvaluate,
+    },
+    {
+      name: "Financeiro",
+      icon: CreditCard,
+      href: "/financial",
+      current: location.pathname.startsWith("/financial"),
+      show: canManageFinancial,
+    },
+    {
+      name: "Comunicação",
+      icon: MessageSquare,
+      href: "/communication",
+      current: location.pathname.startsWith("/communication"),
+      show: true,
+    },
+    {
+      name: "Eventos",
+      icon: Calendar,
+      href: "/events",
+      current: location.pathname.startsWith("/events"),
+      show: true,
+    },
+    {
+      name: "Relatórios",
+      icon: BarChart3,
+      href: "/reports",
+      current: location.pathname.startsWith("/reports"),
+      show: canViewReports,
+    },
+    {
+      name: "Certificados",
+      icon: Award,
+      href: "/certificates",
+      current: location.pathname.startsWith("/certificates"),
+      show: true,
+    },
+  ].filter(item => item.show);
+
+  const quickActions = [
+    {
+      name: "Novo Projeto",
+      icon: FlaskConical,
+      href: "/projects/new",
+      show: canManageProjects,
+    },
+    {
+      name: "Adicionar Usuário",
+      icon: Users,
+      href: "/users/new",
+      show: canManageUsers,
+    },
+    {
+      name: "Criar Evento",
+      icon: Calendar,
+      href: "/events/new",
+      show: true,
+    },
+  ].filter(action => action.show);
   return (
     <div className={cn("pb-12 w-64 bg-card border-r", className)}>
       <div className="space-y-4 py-4">
@@ -117,15 +133,18 @@ export const Sidebar = ({ className }: SidebarProps) => {
                     "w-full justify-start gap-3 px-4 py-2 h-10",
                     item.current && "bg-primary/10 text-primary border-l-2 border-primary"
                   )}
+                  asChild
                 >
-                  <item.icon className="w-4 h-4" />
-                  <span className="flex-1 text-left">{item.name}</span>
-                  {item.badge && (
-                    <Badge variant="secondary" className="ml-auto text-xs">
-                      {item.badge}
-                    </Badge>
-                  )}
-                  {!item.current && <ChevronRight className="w-3 h-3 opacity-50" />}
+                  <Link to={item.href}>
+                    <item.icon className="w-4 h-4" />
+                    <span className="flex-1 text-left">{item.name}</span>
+                    {item.badge && (
+                      <Badge variant="secondary" className="ml-auto text-xs">
+                        {item.badge}
+                      </Badge>
+                    )}
+                    {!item.current && <ChevronRight className="w-3 h-3 opacity-50" />}
+                  </Link>
                 </Button>
               ))}
             </div>
@@ -144,9 +163,12 @@ export const Sidebar = ({ className }: SidebarProps) => {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start gap-2 px-4"
+                  asChild
                 >
-                  <action.icon className="w-3 h-3" />
-                  {action.name}
+                  <Link to={action.href}>
+                    <action.icon className="w-3 h-3" />
+                    {action.name}
+                  </Link>
                 </Button>
               ))}
             </div>
