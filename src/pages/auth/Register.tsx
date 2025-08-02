@@ -25,6 +25,12 @@ const roleOptions: { value: FebicRole; label: string; description: string; needs
     description: 'Orienta projetos de estudantes',
     needsApproval: false 
   },
+  { 
+    value: 'admin_staff', 
+    label: 'Administrador', 
+    description: 'Acesso administrativo completo ao sistema',
+    needsApproval: false 
+  },
 ];
 
 const Register = () => {
