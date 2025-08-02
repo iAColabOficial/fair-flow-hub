@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Award, Users, BookOpen, TrendingUp, Shield, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import febicLogo from "@/assets/febic-logo.png";
 
 const Home = () => {
   const features = [
@@ -44,9 +45,7 @@ const Home = () => {
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">F</span>
-            </div>
+            <img src={febicLogo} alt="FEBIC" className="h-8 w-auto" />
             <div>
               <h1 className="text-lg font-bold text-foreground">FEBIC</h1>
               <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
@@ -158,9 +157,7 @@ const Home = () => {
       <footer className="border-t py-12 px-4">
         <div className="container mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">F</span>
-            </div>
+            <img src={febicLogo} alt="FEBIC" className="h-8 w-auto" />
             <span className="text-lg font-bold text-foreground">FEBIC</span>
           </div>
           <p className="text-muted-foreground">

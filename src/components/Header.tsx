@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import febicLogo from "@/assets/febic-logo.png";
 
 export const Header = () => {
   return (
@@ -17,9 +18,7 @@ export const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">F</span>
-            </div>
+            <img src={febicLogo} alt="FEBIC" className="h-8 w-auto" />
             <div>
               <h1 className="text-lg font-bold text-foreground">FEBIC</h1>
               <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>

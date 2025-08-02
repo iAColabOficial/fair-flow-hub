@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import febicLogo from "@/assets/febic-logo.png";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,9 +27,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3 justify-center">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold">F</span>
-          </div>
+          <img src={febicLogo} alt="FEBIC" className="h-10 w-auto" />
           <div className="text-center">
             <h1 className="text-xl font-bold text-foreground">FEBIC</h1>
             <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
