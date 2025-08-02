@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { 
   Users, 
   FlaskConical, 
@@ -9,81 +11,107 @@ import {
   Calendar,
   Award,
   DollarSign,
-  Target
+  Target,
+  FileText,
+  Star,
+  UserPlus,
+  CreditCard,
+  MessageSquare
 } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total de Usuários",
-    value: "1.247",
-    change: "+12%",
-    changeType: "positive" as const,
-    icon: Users,
-    description: "Participantes ativos",
-  },
-  {
-    title: "Projetos Ativos",
-    value: "156",
-    change: "+8%",
-    changeType: "positive" as const,
-    icon: FlaskConical,
-    description: "Submetidos este mês",
-  },
-  {
-    title: "Avaliações",
-    value: "89",
-    change: "57%",
-    changeType: "neutral" as const,
-    icon: ClipboardCheck,
-    description: "Taxa de conclusão",
-  },
-  {
-    title: "Receita",
-    value: "R$ 24.580",
-    change: "+15%",
-    changeType: "positive" as const,
-    icon: DollarSign,
-    description: "Este mês",
-  },
-];
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+};
 
-const recentActivity = [
-  {
-    title: "Novo projeto submetido",
-    description: "Eficiência Energética Solar por Maria Silva",
-    time: "2 horas atrás",
-    type: "project",
-    icon: FlaskConical,
-  },
-  {
-    title: "Avaliação concluída",
-    description: "Projeto #127 avaliado pelo Dr. Santos",
-    time: "4 horas atrás",
-    type: "evaluation",
-    icon: ClipboardCheck,
-  },
-  {
-    title: "Novo usuário registrado",
-    description: "João Pedro - Categoria estudante",
-    time: "6 horas atrás",
-    type: "user",
-    icon: Users,
-  },
-  {
-    title: "Pagamento recebido",
-    description: "Taxa de inscrição - Escola ABC",
-    time: "1 dia atrás",
-    type: "payment",
-    icon: DollarSign,
-  },
-];
+const getActivityIcon = (action: string) => {
+  switch (action) {
+    case 'project_submitted':
+      return FileText;
+    case 'evaluation_completed':
+      return Star;
+    case 'user_registered':
+      return UserPlus;
+    case 'payment_received':
+      return CreditCard;
+    default:
+      return MessageSquare;
+  }
+};
+
+const getActivityDescription = (action: string, details: any) => {
+  switch (action) {
+    case 'user_registered':
+      return `Novo usuário registrado: ${details?.email || 'usuário'}`;
+    case 'project_submitted':
+      return `Projeto submetido: ${details?.titulo || 'projeto'}`;
+    case 'evaluation_completed':
+      return `Avaliação concluída para projeto ${details?.project_id || ''}`;
+    case 'payment_received':
+      return `Pagamento recebido: ${formatCurrency(details?.valor || 0)}`;
+    default:
+      return action;
+  }
+};
+
+const formatTimeAgo = (date: string) => {
+  const now = new Date();
+  const activityDate = new Date(date);
+  const diffInMinutes = Math.floor((now.getTime() - activityDate.getTime()) / (1000 * 60));
+  
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} min atrás`;
+  } else if (diffInMinutes < 1440) {
+    const hours = Math.floor(diffInMinutes / 60);
+    return `${hours}h atrás`;
+  } else {
+    const days = Math.floor(diffInMinutes / 1440);
+    return `${days}d atrás`;
+  }
+};
 
 export const DashboardStats = () => {
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: activities, isLoading: activitiesLoading } = useRecentActivity();
+
+  const statsData = [
+    {
+      title: "Total de Usuários",
+      value: stats?.totalUsuarios || 0,
+      changeType: "positive" as const,
+      icon: Users,
+      description: "Usuários registrados",
+    },
+    {
+      title: "Projetos Ativos",
+      value: stats?.projetosAtivos || 0,
+      changeType: "positive" as const,
+      icon: FlaskConical,
+      description: "Em avaliação ou aprovados",
+    },
+    {
+      title: "Avaliações",
+      value: stats?.avaliacoes || 0,
+      changeType: "neutral" as const,
+      icon: ClipboardCheck,
+      description: "Avaliações realizadas",
+    },
+    {
+      title: "Receita",
+      value: formatCurrency(stats?.receita || 0),
+      changeType: "positive" as const,
+      icon: DollarSign,
+      description: "Total arrecadado",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
+        {statsData.map((stat, index) => (
           <Card key={index} className="relative overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -92,14 +120,14 @@ export const DashboardStats = () => {
               <stat.icon className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              {statsLoading ? (
+                <Skeleton className="h-8 w-20 mb-2" />
+              ) : (
+                <div className="text-2xl font-bold text-foreground">
+                  {typeof stat.value === 'number' ? stat.value.toLocaleString('pt-BR') : stat.value}
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-1">
-                <Badge 
-                  variant={stat.changeType === "positive" ? "default" : "secondary"}
-                  className="text-xs"
-                >
-                  {stat.change}
-                </Badge>
                 <p className="text-xs text-muted-foreground">{stat.description}</p>
               </div>
             </CardContent>
@@ -117,27 +145,43 @@ export const DashboardStats = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Submissões de Projetos</span>
-                <span>156/200</span>
+            {statsLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-12" />
+                    </div>
+                    <Skeleton className="h-2 w-full" />
+                  </div>
+                ))}
               </div>
-              <Progress value={78} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Avaliações</span>
-                <span>89/156</span>
-              </div>
-              <Progress value={57} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Pagamentos</span>
-                <span>142/156</span>
-              </div>
-              <Progress value={91} className="h-2" />
-            </div>
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Projetos Submetidos</span>
+                    <span>{stats?.projetosAtivos || 0}</span>
+                  </div>
+                  <Progress value={Math.min((stats?.projetosAtivos || 0) * 10, 100)} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Avaliações Realizadas</span>
+                    <span>{stats?.avaliacoes || 0}</span>
+                  </div>
+                  <Progress value={Math.min((stats?.avaliacoes || 0) * 5, 100)} className="h-2" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Usuários Cadastrados</span>
+                    <span>{stats?.totalUsuarios || 0}</span>
+                  </div>
+                  <Progress value={Math.min((stats?.totalUsuarios || 0) * 2, 100)} className="h-2" />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -150,24 +194,42 @@ export const DashboardStats = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="mt-0.5 p-1.5 bg-primary/10 rounded-md">
-                    <activity.icon className="w-3 h-3 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {activity.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.description}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {activity.time}
-                    </p>
-                  </div>
+              {activitiesLoading ? (
+                <div className="space-y-3">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Skeleton className="w-6 h-6 rounded-md" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : activities && activities.length > 0 ? (
+                activities.map((activity, index) => {
+                  const Icon = getActivityIcon(activity.action);
+                  return (
+                    <div key={index} className="flex items-start gap-3">
+                      <div className="mt-0.5 p-1.5 bg-primary/10 rounded-md">
+                        <Icon className="w-3 h-3 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {getActivityDescription(activity.action, activity.details)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatTimeAgo(activity.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Nenhuma atividade recente
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
