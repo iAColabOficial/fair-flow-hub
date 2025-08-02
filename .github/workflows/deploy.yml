@@ -1,0 +1,23 @@
+name: Deploy to VPS
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /root/supabase-selfhost/supabase/docker/lovable_febic
+            git pull origin main
+            npm ci
+            npm run build
+            cd /root/supabase-proxy
+            docker compose restart
