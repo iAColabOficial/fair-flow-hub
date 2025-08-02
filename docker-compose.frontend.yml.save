@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  lovable-frontend:
+    image: nginx:alpine
+    restart: unless-stopped
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.febic.rule=Host(`febic.ibicsc.com.br`)"
+      - "traefik.http.routers.febic.entrypoints=websecure"
+      - "traefik.http.routers.febic.tls.certresolver=letsencryptresolver"
+      - "traefik.http.services.febic.loadbalancer.server.port=80"
