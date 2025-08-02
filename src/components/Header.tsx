@@ -22,7 +22,7 @@ export const Header = () => {
             </div>
             <div>
               <h1 className="text-lg font-bold text-foreground">FEBIC</h1>
-              <p className="text-xs text-muted-foreground">Science Fair Platform</p>
+              <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@ export const Header = () => {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Admin User</p>
+                  <p className="text-sm font-medium leading-none">Usuário Admin</p>
                   <p className="text-xs leading-none text-muted-foreground">
                     admin@febic.com
                   </p>
@@ -62,15 +62,15 @@ export const Header = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Perfil</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+                <span>Configurações</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive">
-                <span>Log out</span>
+                <span>Sair</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

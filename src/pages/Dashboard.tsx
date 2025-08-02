@@ -14,10 +14,10 @@ const Index = () => {
         <main className="flex-1 p-6 space-y-8">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">
-              FEBIC Dashboard
+              Painel FEBIC
             </h1>
             <p className="text-muted-foreground text-lg">
-              Welcome to the Science Fair Management Platform
+              Bem-vindo à Plataforma de Gestão da Feira de Iniciação Científica
             </p>
           </div>
 

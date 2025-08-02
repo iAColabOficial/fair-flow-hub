@@ -19,84 +19,84 @@ import {
 
 const modules = [
   {
-    title: "User Management",
-    description: "Manage student, teacher, and evaluator registrations with role-based permissions",
+    title: "Gestão de Usuários",
+    description: "Gerencie registros de estudantes, professores e avaliadores com permissões baseadas em funções",
     icon: Users,
     status: "active",
-    stats: { total: "1,247 users", pending: "12 pending approvals" },
+    stats: { total: "1.247 usuários", pending: "12 aprovações pendentes" },
     color: "bg-blue-500",
     href: "/users",
-    actions: ["View Users", "Pending Approvals", "Add User"],
+    actions: ["Ver Usuários", "Aprovações Pendentes", "Adicionar Usuário"],
   },
   {
-    title: "Project System",
-    description: "Complete project lifecycle from creation to submission with documentation",
+    title: "Sistema de Projetos",
+    description: "Ciclo completo de projetos desde criação até submissão com documentação",
     icon: FlaskConical,
     status: "active",
-    stats: { total: "156 projects", pending: "23 pending review" },
+    stats: { total: "156 projetos", pending: "23 aguardando revisão" },
     color: "bg-green-500",
     href: "/projects",
-    actions: ["View Projects", "Review Queue", "Create Project"],
+    actions: ["Ver Projetos", "Fila de Revisão", "Criar Projeto"],
   },
   {
-    title: "Evaluation System",
-    description: "Automated evaluation distribution with comprehensive grading interface",
+    title: "Sistema de Avaliação",
+    description: "Distribuição automatizada de avaliações com interface abrangente de notas",
     icon: ClipboardCheck,
     status: "in-progress",
-    stats: { total: "89 completed", pending: "67 remaining" },
+    stats: { total: "89 concluídas", pending: "67 restantes" },
     color: "bg-orange-500",
     href: "/evaluations",
-    actions: ["View Evaluations", "Assign Evaluators", "Results"],
+    actions: ["Ver Avaliações", "Atribuir Avaliadores", "Resultados"],
   },
   {
-    title: "Financial Management",
-    description: "ASAAS integration for automatic billing, payments, and financial reports",
+    title: "Gestão Financeira",
+    description: "Integração ASAAS para cobrança automática, pagamentos e relatórios financeiros",
     icon: CreditCard,
     status: "active",
-    stats: { total: "R$ 24,580", pending: "14 pending payments" },
+    stats: { total: "R$ 24.580", pending: "14 pagamentos pendentes" },
     color: "bg-purple-500",
     href: "/financial",
-    actions: ["View Transactions", "Generate Reports", "Payment Links"],
+    actions: ["Ver Transações", "Gerar Relatórios", "Links de Pagamento"],
   },
   {
-    title: "Communication Hub",
-    description: "Schedule management, notifications, and complete audit logs",
+    title: "Centro de Comunicação",
+    description: "Gestão de cronograma, notificações e logs completos de auditoria",
     icon: MessageSquare,
     status: "active",
-    stats: { total: "348 messages", pending: "5 scheduled" },
+    stats: { total: "348 mensagens", pending: "5 agendadas" },
     color: "bg-pink-500",
     href: "/communication",
-    actions: ["Send Message", "View Logs", "Schedule"],
+    actions: ["Enviar Mensagem", "Ver Logs", "Agendar"],
   },
   {
-    title: "Events & Calendar",
-    description: "Manage fair events, deadlines, and important dates",
+    title: "Eventos e Calendário",
+    description: "Gerencie eventos da feira, prazos e datas importantes",
     icon: Calendar,
     status: "active",
-    stats: { total: "12 events", pending: "3 upcoming" },
+    stats: { total: "12 eventos", pending: "3 próximos" },
     color: "bg-indigo-500",
     href: "/events",
-    actions: ["View Calendar", "Create Event", "Manage Deadlines"],
+    actions: ["Ver Calendário", "Criar Evento", "Gerenciar Prazos"],
   },
   {
-    title: "Analytics & BI",
-    description: "Comprehensive business intelligence and performance analytics",
+    title: "Analytics e BI",
+    description: "Business intelligence abrangente e análises de desempenho",
     icon: BarChart3,
     status: "active",
-    stats: { total: "15 reports", pending: "Weekly report due" },
+    stats: { total: "15 relatórios", pending: "Relatório semanal devido" },
     color: "bg-cyan-500",
     href: "/analytics",
-    actions: ["View Dashboard", "Generate Report", "Export Data"],
+    actions: ["Ver Dashboard", "Gerar Relatório", "Exportar Dados"],
   },
   {
-    title: "Certificates & Awards",
-    description: "Automated certificate generation and award management system",
+    title: "Certificados e Premiações",
+    description: "Geração automatizada de certificados e sistema de gestão de premiações",
     icon: Award,
     status: "pending",
-    stats: { total: "45 certificates", pending: "Ready for generation" },
+    stats: { total: "45 certificados", pending: "Pronto para geração" },
     color: "bg-yellow-500",
     href: "/certificates",
-    actions: ["Generate Certificates", "View Templates", "Award Winners"],
+    actions: ["Gerar Certificados", "Ver Modelos", "Premiar Vencedores"],
   },
 ];
 
@@ -131,12 +131,12 @@ export const ModuleCards = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">System Modules</h2>
-          <p className="text-muted-foreground">Manage all aspects of your science fair</p>
+          <h2 className="text-2xl font-bold text-foreground">Módulos do Sistema</h2>
+          <p className="text-muted-foreground">Gerencie todos os aspectos da sua feira de ciências</p>
         </div>
         <Button variant="outline" className="gap-2">
           <Settings className="w-4 h-4" />
-          System Settings
+          Configurações do Sistema
         </Button>
       </div>
 
@@ -194,7 +194,7 @@ export const ModuleCards = () => {
                 className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                 variant="outline"
               >
-                Open Module
+                Abrir Módulo
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </CardContent>

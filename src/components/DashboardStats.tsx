@@ -14,65 +14,65 @@ import {
 
 const stats = [
   {
-    title: "Total Users",
-    value: "1,247",
+    title: "Total de Usuários",
+    value: "1.247",
     change: "+12%",
     changeType: "positive" as const,
     icon: Users,
-    description: "Active participants",
+    description: "Participantes ativos",
   },
   {
-    title: "Active Projects",
+    title: "Projetos Ativos",
     value: "156",
     change: "+8%",
     changeType: "positive" as const,
     icon: FlaskConical,
-    description: "Submitted this month",
+    description: "Submetidos este mês",
   },
   {
-    title: "Evaluations",
+    title: "Avaliações",
     value: "89",
     change: "57%",
     changeType: "neutral" as const,
     icon: ClipboardCheck,
-    description: "Completion rate",
+    description: "Taxa de conclusão",
   },
   {
-    title: "Revenue",
-    value: "R$ 24,580",
+    title: "Receita",
+    value: "R$ 24.580",
     change: "+15%",
     changeType: "positive" as const,
     icon: DollarSign,
-    description: "This month",
+    description: "Este mês",
   },
 ];
 
 const recentActivity = [
   {
-    title: "New project submitted",
-    description: "Solar Energy Efficiency by Maria Silva",
-    time: "2 hours ago",
+    title: "Novo projeto submetido",
+    description: "Eficiência Energética Solar por Maria Silva",
+    time: "2 horas atrás",
     type: "project",
     icon: FlaskConical,
   },
   {
-    title: "Evaluation completed",
-    description: "Project #127 evaluated by Dr. Santos",
-    time: "4 hours ago",
+    title: "Avaliação concluída",
+    description: "Projeto #127 avaliado pelo Dr. Santos",
+    time: "4 horas atrás",
     type: "evaluation",
     icon: ClipboardCheck,
   },
   {
-    title: "New user registered",
-    description: "João Pedro - Student category",
-    time: "6 hours ago",
+    title: "Novo usuário registrado",
+    description: "João Pedro - Categoria estudante",
+    time: "6 horas atrás",
     type: "user",
     icon: Users,
   },
   {
-    title: "Payment received",
-    description: "Registration fee - School ABC",
-    time: "1 day ago",
+    title: "Pagamento recebido",
+    description: "Taxa de inscrição - Escola ABC",
+    time: "1 dia atrás",
     type: "payment",
     icon: DollarSign,
   },
@@ -113,27 +113,27 @@ export const DashboardStats = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-4 h-4 text-primary" />
-              Fair Progress
+              Progresso da Feira
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Project Submissions</span>
+                <span>Submissões de Projetos</span>
                 <span>156/200</span>
               </div>
               <Progress value={78} className="h-2" />
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Evaluations</span>
+                <span>Avaliações</span>
                 <span>89/156</span>
               </div>
               <Progress value={57} className="h-2" />
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Payments</span>
+                <span>Pagamentos</span>
                 <span>142/156</span>
               </div>
               <Progress value={91} className="h-2" />
@@ -145,7 +145,7 @@ export const DashboardStats = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
-              Recent Activity
+              Atividade Recente
             </CardTitle>
           </CardHeader>
           <CardContent>

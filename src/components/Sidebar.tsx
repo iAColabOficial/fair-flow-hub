@@ -23,58 +23,58 @@ interface SidebarProps {
 
 const navigation = [
   {
-    name: "Dashboard",
+    name: "Painel",
     icon: Home,
     href: "/",
     current: true,
   },
   {
-    name: "User Management",
+    name: "Gestão de Usuários",
     icon: Users,
     href: "/users",
     current: false,
     badge: "12",
   },
   {
-    name: "Projects",
+    name: "Projetos",
     icon: FlaskConical,
     href: "/projects",
     current: false,
     badge: "45",
   },
   {
-    name: "Evaluations",
+    name: "Avaliações",
     icon: ClipboardCheck,
     href: "/evaluations",
     current: false,
     badge: "8",
   },
   {
-    name: "Financial",
+    name: "Financeiro",
     icon: CreditCard,
     href: "/financial",
     current: false,
   },
   {
-    name: "Communication",
+    name: "Comunicação",
     icon: MessageSquare,
     href: "/communication",
     current: false,
   },
   {
-    name: "Events",
+    name: "Eventos",
     icon: Calendar,
     href: "/events",
     current: false,
   },
   {
-    name: "Reports",
+    name: "Relatórios",
     icon: BarChart3,
     href: "/reports",
     current: false,
   },
   {
-    name: "Certificates",
+    name: "Certificados",
     icon: Award,
     href: "/certificates",
     current: false,
@@ -83,17 +83,17 @@ const navigation = [
 
 const quickActions = [
   {
-    name: "New Project",
+    name: "Novo Projeto",
     icon: FlaskConical,
     href: "/projects/new",
   },
   {
-    name: "Add User",
+    name: "Adicionar Usuário",
     icon: Users,
     href: "/users/new",
   },
   {
-    name: "Create Event",
+    name: "Criar Evento",
     icon: Calendar,
     href: "/events/new",
   },
@@ -106,7 +106,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
         <div className="px-3 py-2">
           <div className="space-y-1">
             <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-foreground">
-              Main Navigation
+              Navegação Principal
             </h2>
             <div className="space-y-1">
               {navigation.map((item) => (
@@ -135,7 +135,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
         <div className="px-3 py-2">
           <div className="space-y-1">
             <h2 className="mb-2 px-4 text-sm font-semibold tracking-tight text-muted-foreground">
-              Quick Actions
+              Ações Rápidas
             </h2>
             <div className="space-y-1">
               {quickActions.map((action) => (
@@ -157,13 +157,13 @@ export const Sidebar = ({ className }: SidebarProps) => {
           <div className="rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 p-4 border">
             <div className="flex items-center gap-2 mb-2">
               <Award className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">Fair Status</span>
+              <span className="text-sm font-medium">Status da Feira</span>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              2024 Science Fair is currently in the evaluation phase
+              FEBIC 2025 está atualmente na fase de avaliação
             </p>
             <Button size="sm" variant="gradient" className="w-full">
-              View Details
+              Ver Detalhes
             </Button>
           </div>
         </div>
