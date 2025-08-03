@@ -10,8 +10,7 @@ import {
   Target,
   UserPlus
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -37,35 +36,8 @@ const formatTimeAgo = (date: string) => {
 };
 
 export const DashboardStats = () => {
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ['dashboard-stats'],
-    queryFn: async () => {
-      const [usersResult, rolesResult] = await Promise.all([
-        supabase.from('users').select('id', { count: 'exact' }),
-        supabase.from('user_roles').select('id', { count: 'exact' }).eq('status', 'ativo')
-      ]);
-
-      return {
-        totalUsuarios: usersResult.count || 0,
-        projetosAtivos: 0, // Will be implemented when projects are created
-        avaliacoes: 0, // Will be implemented when evaluations are created
-        receita: 0 // Will be implemented when payments are created
-      };
-    }
-  });
-
-  const { data: recentRoles, isLoading: activitiesLoading } = useQuery({
-    queryKey: ['recent-roles'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      return data || [];
-    }
-  });
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: recentActivity, isLoading: activitiesLoading } = useRecentActivity();
 
   const statsData = [
     {
@@ -193,18 +165,18 @@ export const DashboardStats = () => {
                     </div>
                   ))}
                 </div>
-              ) : recentRoles && recentRoles.length > 0 ? (
-                recentRoles.map((role, index) => (
+              ) : recentActivity && recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="mt-0.5 p-1.5 bg-primary/10 rounded-md">
                       <UserPlus className="w-3 h-3 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground">
-                        Nova permissão: {role.role_type}
+                        {activity.action}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {formatTimeAgo(role.created_at)}
+                        {formatTimeAgo(activity.created_at)}
                       </p>
                     </div>
                   </div>

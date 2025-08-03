@@ -13,6 +13,18 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import NotFound from "./pages/NotFound";
 
+// Module Pages
+import ProjectList from "./pages/projects/ProjectList";
+import ProjectDetails from "./pages/projects/ProjectDetails";
+import ProjectEdit from "./pages/projects/ProjectEdit";
+import EvaluatorDashboard from "./pages/evaluation/EvaluatorDashboard";
+import EvaluateProject from "./pages/evaluation/EvaluateProject";
+import MyEvaluations from "./pages/evaluation/MyEvaluations";
+import AvailabilityManagement from "./pages/evaluation/AvailabilityManagement";
+import PaymentManagement from "./pages/finance/PaymentManagement";
+import SystemReports from "./pages/admin/SystemReports";
+import ScheduleManagement from "./pages/admin/ScheduleManagement";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,24 +57,65 @@ const App = () => (
                 <AssignRolesPage />
               </ProtectedRoute>
             } />
-            <Route path="/projects/*" element={
+            
+            {/* Module Routes */}
+            <Route path="/projects" element={
               <ProtectedRoute>
-                <Dashboard />
+                <ProjectList />
               </ProtectedRoute>
             } />
-            <Route path="/evaluations/*" element={
+            <Route path="/projects/:id" element={
               <ProtectedRoute>
-                <Dashboard />
+                <ProjectDetails />
               </ProtectedRoute>
             } />
-            <Route path="/financial/*" element={
+            <Route path="/projects/:id/edit" element={
               <ProtectedRoute>
-                <Dashboard />
+                <ProjectEdit />
               </ProtectedRoute>
             } />
-            <Route path="/admin/*" element={
+            
+            <Route path="/evaluation" element={
               <ProtectedRoute>
-                <Dashboard />
+                <EvaluatorDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/evaluation/evaluate/:id" element={
+              <ProtectedRoute>
+                <EvaluateProject />
+              </ProtectedRoute>
+            } />
+            <Route path="/evaluation/my" element={
+              <ProtectedRoute>
+                <MyEvaluations />
+              </ProtectedRoute>
+            } />
+            <Route path="/evaluation/availability" element={
+              <ProtectedRoute>
+                <AvailabilityManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/finance" element={
+              <ProtectedRoute>
+                <PaymentManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/reports" element={
+              <ProtectedRoute>
+                <SystemReports />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/schedule" element={
+              <ProtectedRoute>
+                <ScheduleManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/communication" element={
+              <ProtectedRoute>
+                <NotFound />
               </ProtectedRoute>
             } />
             
