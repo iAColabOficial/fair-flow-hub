@@ -2,15 +2,21 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { User as CustomUser, UserRole, UserProfile } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  customUser: CustomUser | null;
+  userRoles: UserRole[];
+  userProfile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   cleanupAuthState: () => void;
+  hasRole: (role: string) => boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +43,49 @@ export const cleanupAuthState = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [customUser, setCustomUser] = useState<CustomUser | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserData = async (userId: string) => {
+    try {
+      // Buscar dados do usuário customizado
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (userData) {
+        setCustomUser(userData);
+      }
+
+      // Buscar roles do usuário
+      const { data: rolesData } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'ativo');
+
+      if (rolesData) {
+        setUserRoles(rolesData);
+      }
+
+      // Buscar perfil do usuário
+      const { data: profileData } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (profileData) {
+        setUserProfile(profileData);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -45,6 +93,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Defer database calls to prevent auth state change deadlock
+          setTimeout(() => {
+            fetchUserData(session.user.id);
+          }, 0);
+        } else {
+          setCustomUser(null);
+          setUserRoles([]);
+          setUserProfile(null);
+        }
+        
         setLoading(false);
       }
     );
@@ -53,6 +113,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserData(session.user.id);
+        }, 0);
+      }
+      
       setLoading(false);
     });
 
@@ -176,6 +243,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       toast.success('Logout realizado com sucesso!');
       
+      setCustomUser(null);
+      setUserRoles([]);
+      setUserProfile(null);
+      
       // Force page reload for clean state
       window.location.href = '/auth/login';
     } catch (error) {
@@ -183,14 +254,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const hasRole = (role: string) => {
+    return userRoles.some(userRole => userRole.role_type === role);
+  };
+
+  const isAdmin = hasRole('admin_staff') || hasRole('diretor') || hasRole('coordenador_admin');
+
   const value = {
     user,
     session,
+    customUser,
+    userRoles,
+    userProfile,
     loading,
     signIn,
     signUp,
     signOut,
     cleanupAuthState,
+    hasRole,
+    isAdmin,
   };
 
   return (
