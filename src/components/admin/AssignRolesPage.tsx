@@ -43,7 +43,7 @@ const AssignRolesPage = () => {
         .select(`
           *,
           user_profiles(*),
-          user_roles(*)
+          user_roles!user_roles_user_id_fkey(*)
         `)
         .order('nome');
 
