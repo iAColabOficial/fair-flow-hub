@@ -1,59 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { 
   Users, 
   FlaskConical, 
-  ClipboardCheck, 
-  TrendingUp,
+  ClipboardCheck,
   Calendar,
-  Award,
   DollarSign,
   Target,
-  FileText,
-  Star,
-  UserPlus,
-  CreditCard,
-  MessageSquare
+  UserPlus
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL'
   }).format(value);
-};
-
-const getActivityIcon = (action: string) => {
-  switch (action) {
-    case 'project_submitted':
-      return FileText;
-    case 'evaluation_completed':
-      return Star;
-    case 'user_registered':
-      return UserPlus;
-    case 'payment_received':
-      return CreditCard;
-    default:
-      return MessageSquare;
-  }
-};
-
-const getActivityDescription = (action: string, details: any) => {
-  switch (action) {
-    case 'user_registered':
-      return `Novo usuário registrado: ${details?.email || 'usuário'}`;
-    case 'project_submitted':
-      return `Projeto submetido: ${details?.titulo || 'projeto'}`;
-    case 'evaluation_completed':
-      return `Avaliação concluída para projeto ${details?.project_id || ''}`;
-    case 'payment_received':
-      return `Pagamento recebido: ${formatCurrency(details?.valor || 0)}`;
-    default:
-      return action;
-  }
 };
 
 const formatTimeAgo = (date: string) => {
@@ -73,35 +37,58 @@ const formatTimeAgo = (date: string) => {
 };
 
 export const DashboardStats = () => {
-  const { data: stats, isLoading: statsLoading } = useDashboardStats();
-  const { data: activities, isLoading: activitiesLoading } = useRecentActivity();
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: async () => {
+      const [usersResult, rolesResult] = await Promise.all([
+        supabase.from('users').select('id', { count: 'exact' }),
+        supabase.from('user_roles').select('id', { count: 'exact' }).eq('status', 'ativo')
+      ]);
+
+      return {
+        totalUsuarios: usersResult.count || 0,
+        projetosAtivos: 0, // Will be implemented when projects are created
+        avaliacoes: 0, // Will be implemented when evaluations are created
+        receita: 0 // Will be implemented when payments are created
+      };
+    }
+  });
+
+  const { data: recentRoles, isLoading: activitiesLoading } = useQuery({
+    queryKey: ['recent-roles'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_roles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      return data || [];
+    }
+  });
 
   const statsData = [
     {
       title: "Total de Usuários",
       value: stats?.totalUsuarios || 0,
-      changeType: "positive" as const,
       icon: Users,
       description: "Usuários registrados",
     },
     {
       title: "Projetos Ativos",
       value: stats?.projetosAtivos || 0,
-      changeType: "positive" as const,
       icon: FlaskConical,
       description: "Em avaliação ou aprovados",
     },
     {
       title: "Avaliações",
       value: stats?.avaliacoes || 0,
-      changeType: "neutral" as const,
       icon: ClipboardCheck,
       description: "Avaliações realizadas",
     },
     {
       title: "Receita",
       value: formatCurrency(stats?.receita || 0),
-      changeType: "positive" as const,
       icon: DollarSign,
       description: "Total arrecadado",
     },
@@ -189,7 +176,7 @@ export const DashboardStats = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
-              Atividade Recente
+              Permissões Recentes
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -206,25 +193,22 @@ export const DashboardStats = () => {
                     </div>
                   ))}
                 </div>
-              ) : activities && activities.length > 0 ? (
-                activities.map((activity, index) => {
-                  const Icon = getActivityIcon(activity.action);
-                  return (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="mt-0.5 p-1.5 bg-primary/10 rounded-md">
-                        <Icon className="w-3 h-3 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">
-                          {getActivityDescription(activity.action, activity.details)}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatTimeAgo(activity.created_at)}
-                        </p>
-                      </div>
+              ) : recentRoles && recentRoles.length > 0 ? (
+                recentRoles.map((role, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="mt-0.5 p-1.5 bg-primary/10 rounded-md">
+                      <UserPlus className="w-3 h-3 text-primary" />
                     </div>
-                  );
-                })
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">
+                        Nova permissão: {role.role_type}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {formatTimeAgo(role.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                ))
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Nenhuma atividade recente

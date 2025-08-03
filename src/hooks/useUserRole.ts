@@ -37,12 +37,12 @@ export const useUserRole = () => {
       return {
         id: data.id,
         user_id: data.user_id,
-        role: data.role as FebicRole,
+        role: data.role_type as FebicRole,
         status: data.status as 'pendente' | 'ativo' | 'inativo',
         created_at: data.created_at,
         approved_at: data.approved_at,
         approved_by: data.approved_by,
-        notes: data.notes,
+        notes: '',
       };
     },
     enabled: true,

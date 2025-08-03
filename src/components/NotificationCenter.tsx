@@ -9,10 +9,10 @@ import { toast } from "sonner";
 interface Notification {
   id: string;
   user_id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  read_at?: string;
+  titulo: string;
+  mensagem: string;
+  tipo: 'info' | 'warning' | 'error' | 'success';
+  is_read: boolean;
   created_at: string;
 }
 
@@ -31,21 +31,18 @@ export const NotificationCenter = () => {
         .limit(10);
 
       if (error) throw error;
-      return (data || []).map(item => ({
-        ...item,
-        type: (item.type as 'info' | 'success' | 'warning' | 'error') || 'info'
-      }));
+      return data || [];
     },
     refetchInterval: 30000, // Atualizar a cada 30 segundos
   });
 
-  const unreadCount = notifications.filter(n => !n.read_at).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const markAsRead = async (notificationId: string) => {
     try {
       const { error } = await supabase
         .from('user_notifications')
-        .update({ read_at: new Date().toISOString() })
+        .update({ is_read: true })
         .eq('id', notificationId);
 
       if (error) throw error;
@@ -125,25 +122,25 @@ export const NotificationCenter = () => {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`p-3 rounded-lg border ${getNotificationColor(notification.type)} ${
-                  !notification.read_at ? 'ring-2 ring-primary/20' : ''
+                className={`p-3 rounded-lg border ${getNotificationColor(notification.tipo)} ${
+                  !notification.is_read ? 'ring-2 ring-primary/20' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-0.5">
-                    {getNotificationIcon(notification.type)}
+                    {getNotificationIcon(notification.tipo)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h4 className="text-sm font-medium text-foreground">
-                          {notification.title}
+                          {notification.titulo}
                         </h4>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {notification.message}
+                          {notification.mensagem}
                         </p>
                       </div>
-                      {!notification.read_at && (
+                      {!notification.is_read && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -158,7 +155,7 @@ export const NotificationCenter = () => {
                       <span className="text-xs text-muted-foreground">
                         {formatDate(notification.created_at)}
                       </span>
-                      {!notification.read_at && (
+                      {!notification.is_read && (
                         <Badge variant="secondary" className="text-xs">
                           Nova
                         </Badge>

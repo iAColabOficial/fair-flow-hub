@@ -1,7 +1,7 @@
 import { useUserPermissions } from "@/hooks/useUserRole";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
-import { UserApprovalPage } from "@/components/admin/UserApprovalPage";
+import UserApprovalComponent from "@/components/admin/UserApprovalPage";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield } from "lucide-react";
 
@@ -58,7 +58,7 @@ const UsersPage = () => {
             </p>
           </div>
 
-          <UserApprovalPage />
+          <UserApprovalComponent />
         </main>
       </div>
     </div>

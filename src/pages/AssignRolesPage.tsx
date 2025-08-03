@@ -2,7 +2,7 @@ import { useUserPermissions } from "@/hooks/useUserRole";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
-import { AssignRolesPage as AssignRolesComponent } from "@/components/admin/AssignRolesPage";
+import AssignRolesComponent from "@/components/admin/AssignRolesPage";
 import { Shield } from "lucide-react";
 
 const AssignRolesPage = () => {
