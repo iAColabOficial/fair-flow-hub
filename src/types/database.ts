@@ -4,7 +4,7 @@ export type RoleStatus = 'ativo' | 'pendente' | 'rejeitado' | 'inativo';
 
 export type NivelEscolar = 'educacao_infantil' | 'fundamental_1_3' | 'fundamental_4_6' | 'fundamental_7_9' | 'medio' | 'tecnico' | 'eja' | 'superior' | 'pos_graduacao';
 
-export type ProjectCategoria = 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | 'VII' | 'VIII' | 'RELATO';
+export type ProjectCategoria = 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | 'VII' | 'VIII' | 'IX' | 'RELATO';
 
 export type ProjectStatus = 'rascunho' | 'submetido' | 'selecionado' | 'confirmado_virtual' | 'finalista' | 'confirmado_presencial' | 'avaliado' | 'premiado' | 'desclassificado';
 

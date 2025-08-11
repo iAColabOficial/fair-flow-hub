@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Upload, FileText, Users, Building, BookOpen, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ProjectCategoria } from '@/types/database';
 
 interface ProjectSubmissionForm {
   title: string;
@@ -115,7 +116,7 @@ export default function ProjectSubmission() {
 
       const projectData = {
         titulo: data.title,
-        categoria: data.category as 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | 'VII' | 'VIII' | 'IX',
+        categoria: data.category as ProjectCategoria,
         subcategoria: data.subcategory as 'II_a' | 'II_b' | null,
         area_conhecimento_id: data.area_conhecimento_id,
         resumo: data.resumo,
