@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -7,55 +8,45 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ProjectCategory, KnowledgeArea, InstitutionType } from '@/types/project';
-import { Upload, FileText, Users, Building, BookOpen, Award, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Users, Building, BookOpen, AlertCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProjectSubmissionForm {
   title: string;
-  category: ProjectCategory;
-  area: KnowledgeArea;
+  category: string;
+  subcategory?: string;
+  area_conhecimento_id: string;
+  resumo: string;
+  palavras_chave: string;
   institutionName: string;
-  institutionType: InstitutionType;
   institutionState: string;
   institutionCity: string;
   isPublicInstitution: boolean;
   isFullTimeInstitution: boolean;
-  researchSummary: string;
-  keywords: string;
-  objectives: string;
-  methodology: string;
-  expectedResults: string;
-  references: string;
   authors: string;
   advisor: string;
   coAdvisor?: string;
   specialRequirements: string[];
 }
 
-const categoryLabels = {
-  [ProjectCategory.CATEGORY_I]: 'Categoria I - Educação infantil (pré-escolar)',
-  [ProjectCategory.CATEGORY_II]: 'Categoria II - Estudantes do Ensino Fundamental (1º ao 3º ano)',
-  [ProjectCategory.CATEGORY_III]: 'Categoria III - Estudantes do Ensino Fundamental (4º ao 6º ano)',
-  [ProjectCategory.CATEGORY_IV]: 'Categoria IV - Estudantes do Ensino Fundamental (7º ao 9º ano)',
-  [ProjectCategory.CATEGORY_V]: 'Categoria V - Ensino médio e/ou técnico profissionalizante concomitante',
-  [ProjectCategory.CATEGORY_VI]: 'Categoria VI - Cursos técnicos pós médio',
-  [ProjectCategory.CATEGORY_VII]: 'Categoria VII - Educação de Jovens e adultos',
-  [ProjectCategory.CATEGORY_VIII]: 'Categoria VIII - Ensino superior',
-  [ProjectCategory.CATEGORY_IX]: 'Categoria IX - Pós Graduações'
-};
+const categories = [
+  { value: "I", label: "Categoria I - Educação infantil (pré-escolar)" },
+  { value: "II", label: "Categoria II - Estudantes do Ensino Fundamental (1º ao 3º ano)", hasSubcategory: true },
+  { value: "III", label: "Categoria III - Estudantes do Ensino Fundamental (4º ao 6º ano)" },
+  { value: "IV", label: "Categoria IV - Estudantes do Ensino Fundamental (7º ao 9º ano)" },
+  { value: "V", label: "Categoria V - Ensino médio e/ou técnico profissionalizante concomitante" },
+  { value: "VI", label: "Categoria VI - Cursos técnicos pós médio" },
+  { value: "VII", label: "Categoria VII - Educação de Jovens e adultos" },
+  { value: "VIII", label: "Categoria VIII - Ensino superior" },
+  { value: "IX", label: "Categoria IX - Pós Graduações" }
+];
 
-const areaLabels = {
-  [KnowledgeArea.BIOLOGICAL_SCIENCES]: 'Ciências Biológicas',
-  [KnowledgeArea.HEALTH_SCIENCES]: 'Ciências da Saúde',
-  [KnowledgeArea.AGRICULTURAL_SCIENCES]: 'Ciências Agrárias',
-  [KnowledgeArea.EXACT_EARTH_SCIENCES]: 'Ciências Exatas e da Terra',
-  [KnowledgeArea.ENGINEERING]: 'Engenharias',
-  [KnowledgeArea.HUMAN_SCIENCES]: 'Ciências Humanas',
-  [KnowledgeArea.SOCIAL_SCIENCES]: 'Ciências Sociais',
-  [KnowledgeArea.APPLIED_SOCIAL_SCIENCES]: 'Ciências Sociais Aplicadas'
-};
+const subcategories = [
+  { value: "II_a", label: "Categoria II-a - Estudantes do Ensino Fundamental (1º ao 3º ano)" },
+  { value: "II_b", label: "Categoria II-b - Estudantes do Ensino Fundamental (4º ao 6º ano)" }
+];
 
 const specialRequirements = [
   'Pesquisas que envolvam seres humanos',
@@ -68,15 +59,96 @@ const specialRequirements = [
 
 export default function ProjectSubmission() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
+  const { toast } = useToast();
+  
   const form = useForm<ProjectSubmissionForm>();
 
-  const onSubmit = (data: ProjectSubmissionForm) => {
-    console.log('Submitting project:', data);
-    // Implementar submissão do projeto
+  // Fetch knowledge areas from database
+  const { data: knowledgeAreas, isLoading: areasLoading } = useQuery({
+    queryKey: ['knowledge-areas'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('areas_conhecimento')
+        .select('*')
+        .eq('nivel', 'area')
+        .eq('is_active', true)
+        .order('nome');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Fetch subareas when an area is selected
+  const { data: subAreas, isLoading: subAreasLoading } = useQuery({
+    queryKey: ['sub-areas', selectedArea],
+    queryFn: async () => {
+      if (!selectedArea) return [];
+      
+      const { data, error } = await supabase
+        .from('areas_conhecimento')
+        .select('*')
+        .eq('nivel', 'subarea')
+        .eq('parent_id', selectedArea)
+        .eq('is_active', true)
+        .order('nome');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedArea
+  });
+
+  const onSubmit = async (data: ProjectSubmissionForm) => {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        toast({
+          title: "Erro",
+          description: "Usuário não autenticado",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const projectData = {
+        titulo: data.title,
+        categoria: data.category as 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | 'VII' | 'VIII' | 'IX',
+        subcategoria: data.subcategory as 'II_a' | 'II_b' | null,
+        area_conhecimento_id: data.area_conhecimento_id,
+        resumo: data.resumo,
+        palavras_chave: data.palavras_chave,
+        status: 'rascunho' as 'rascunho',
+        created_by: user.user.id
+      };
+
+      const { error } = await supabase
+        .from('projects')
+        .insert(projectData);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso!",
+        description: "Projeto submetido com sucesso"
+      });
+
+      // Reset form
+      form.reset();
+      setCurrentStep(1);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
 
   const nextStep = () => {
-    if (currentStep < 5) setCurrentStep(currentStep + 1);
+    if (currentStep < 4) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -87,8 +159,7 @@ export default function ProjectSubmission() {
     { number: 1, title: 'Informações Básicas', icon: FileText },
     { number: 2, title: 'Instituição', icon: Building },
     { number: 3, title: 'Equipe', icon: Users },
-    { number: 4, title: 'Plano de Pesquisa', icon: BookOpen },
-    { number: 5, title: 'Documentos', icon: Upload }
+    { number: 4, title: 'Plano de Pesquisa', icon: BookOpen }
   ];
 
   return (
@@ -168,16 +239,19 @@ export default function ProjectSubmission() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Categoria</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={(value) => {
+                          field.onChange(value);
+                          setSelectedCategory(value);
+                        }} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecione a categoria" />
+                              <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Object.entries(categoryLabels).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
+                            {categories.map((category) => (
+                              <SelectItem key={category.value} value={category.value}>
+                                {category.label}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -187,22 +261,57 @@ export default function ProjectSubmission() {
                     )}
                   />
 
+                  {/* Subcategory for Category II */}
+                  {selectedCategory === 'II' && (
+                    <FormField
+                      control={form.control}
+                      name="subcategory"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Subcategoria</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione uma subcategoria" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {subcategories.map((subcategory) => (
+                                <SelectItem key={subcategory.value} value={subcategory.value}>
+                                  {subcategory.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   <FormField
                     control={form.control}
-                    name="area"
+                    name="area_conhecimento_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Área do Conhecimento</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel>Área do Conhecimento CNPQ</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            setSelectedArea(value);
+                            field.onChange(value);
+                          }} 
+                          defaultValue={field.value}
+                          disabled={areasLoading}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione a área do conhecimento" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {Object.entries(areaLabels).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
+                            {knowledgeAreas?.map((area) => (
+                              <SelectItem key={area.id} value={area.id}>
+                                {area.codigo_cnpq ? `${area.codigo_cnpq} - ` : ''}{area.nome}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -211,6 +320,41 @@ export default function ProjectSubmission() {
                       </FormItem>
                     )}
                   />
+
+                  {/* Subareas when area is selected */}
+                  {selectedArea && subAreas && subAreas.length > 0 && (
+                    <FormField
+                      control={form.control}
+                      name="area_conhecimento_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Subárea do Conhecimento</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                            disabled={subAreasLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a subárea (opcional)" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {subAreas.map((subarea) => (
+                                <SelectItem key={subarea.id} value={subarea.id}>
+                                  {subarea.codigo_cnpq ? `${subarea.codigo_cnpq} - ` : ''}{subarea.nome}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Você pode escolher uma subárea mais específica ou manter a área principal
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <div className="bg-muted p-4 rounded-lg">
                     <div className="flex items-start gap-2">
@@ -284,30 +428,6 @@ export default function ProjectSubmission() {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="institutionType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Instituição</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o tipo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value={InstitutionType.MUNICIPAL_PUBLIC}>Pública Municipal</SelectItem>
-                            <SelectItem value={InstitutionType.STATE_PUBLIC}>Pública Estadual</SelectItem>
-                            <SelectItem value={InstitutionType.FEDERAL_PUBLIC}>Pública Federal</SelectItem>
-                            <SelectItem value={InstitutionType.PRIVATE}>Privada</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <div className="space-y-3">
                     <FormField
                       control={form.control}
@@ -359,6 +479,158 @@ export default function ProjectSubmission() {
               </Card>
             )}
 
+            {/* Step 3: Team */}
+            {currentStep === 3 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Equipe do Projeto
+                  </CardTitle>
+                  <CardDescription>
+                    Informe os participantes do projeto
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="authors"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Autores do Projeto</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Liste os nomes dos autores do projeto"
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Liste todos os estudantes autores do projeto
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="advisor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Orientador</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome do orientador" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="coAdvisor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Coorientador (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome do coorientador" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 4: Research Plan */}
+            {currentStep === 4 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Plano de Pesquisa
+                  </CardTitle>
+                  <CardDescription>
+                    Descreva sua pesquisa detalhadamente
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="resumo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Resumo</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Resumo do projeto (1000-2500 caracteres)"
+                            className="min-h-[150px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Entre 1000 e 2500 caracteres incluindo espaços
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="palavras_chave"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Palavras-chave</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Três palavras-chave separadas por vírgula" {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Três palavras ou termos chaves separados por vírgula
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div>
+                    <h4 className="font-medium mb-3">Requisitos Especiais</h4>
+                    <div className="space-y-2">
+                      {specialRequirements.map((requirement) => (
+                        <FormField
+                          key={requirement}
+                          control={form.control}
+                          name="specialRequirements"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(requirement)}
+                                  onCheckedChange={(checked) => {
+                                    const value = field.value || [];
+                                    if (checked) {
+                                      field.onChange([...value, requirement]);
+                                    } else {
+                                      field.onChange(value.filter((item) => item !== requirement));
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal">
+                                {requirement}
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Navigation Buttons */}
             <div className="flex justify-between">
               {currentStep > 1 && (
@@ -367,7 +639,7 @@ export default function ProjectSubmission() {
                 </Button>
               )}
               <div className="ml-auto">
-                {currentStep < 5 ? (
+                {currentStep < 4 ? (
                   <Button type="button" onClick={nextStep}>
                     Próximo
                   </Button>

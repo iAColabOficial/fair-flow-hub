@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 
 // Module Pages
 import ProjectList from "./pages/projects/ProjectList";
+import ProjectSubmission from "./pages/projects/ProjectSubmission";
 import ProjectDetails from "./pages/projects/ProjectDetails";
 import ProjectEdit from "./pages/projects/ProjectEdit";
 import EvaluatorDashboard from "./pages/evaluation/EvaluatorDashboard";
@@ -63,6 +64,11 @@ const App = () => (
             <Route path="/projects" element={
               <ProtectedRoute>
                 <ProjectList />
+              </ProtectedRoute>
+            } />
+            <Route path="/projects/new" element={
+              <ProtectedRoute>
+                <ProjectSubmission />
               </ProtectedRoute>
             } />
             <Route path="/projects/:id" element={

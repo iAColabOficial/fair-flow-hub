@@ -118,8 +118,17 @@ const Dashboard = () => {
             </Alert>
           )}
 
-          <DashboardStats />
-          <ModuleCards />
+          {/* Conditional dashboard components based on user role */}
+          {(userRole === 'admin_staff' || userRole === 'coordenador_admin' || userRole === 'diretor') && (
+            <>
+              <DashboardStats />
+              <ModuleCards />
+            </>
+          )}
+          
+          {(userRole === 'autor' || userRole === 'orientador' || userRole === 'coorientador') && (
+            <ModuleCards />
+          )}
         </main>
       </div>
     </div>
