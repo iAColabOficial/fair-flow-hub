@@ -23,6 +23,7 @@ interface ProjectSubmissionForm {
   area_conhecimento_id: string;
   resumo: string;
   palavras_chave: string;
+  tokenFeira?: string;
   institutionName: string;
   institutionState: string;
   institutionCity: string;
@@ -148,7 +149,9 @@ export default function ProjectSubmission() {
         area_conhecimento_id: data.area_conhecimento_id,
         resumo: data.resumo,
         palavras_chave: data.palavras_chave,
-        status: 'rascunho' as const,
+        token_feira: data.tokenFeira || null,
+        is_credenciado: !!data.tokenFeira,
+        status: data.tokenFeira ? 'selecionado' as const : 'rascunho' as const,
         created_by: user.user.id
       };
 
@@ -399,6 +402,26 @@ export default function ProjectSubmission() {
                       )}
                     />
                   )}
+
+                  <FormField
+                    control={form.control}
+                    name="tokenFeira"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Token de Projeto Credenciado (Opcional)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Digite o token se o projeto foi credenciado por outra feira" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Projetos credenciados por outras feiras passam direto para a fase virtual
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <div className="bg-muted p-4 rounded-lg">
                     <div className="flex items-start gap-2">
