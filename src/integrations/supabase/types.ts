@@ -863,13 +863,6 @@ export type Database = {
             referencedRelation: "areas_conhecimento"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "projects_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       system_logs: {
