@@ -19,7 +19,6 @@ const projectSchema = z.object({
   resumo: z.string().optional(),
   palavras_chave: z.string().optional(),
   categoria: z.string().min(1, 'Categoria é obrigatória'),
-  subcategoria: z.string().optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -38,7 +37,6 @@ const ProjectEdit = () => {
       resumo: '',
       palavras_chave: '',
       categoria: '',
-      subcategoria: '',
     },
   });
 
@@ -58,7 +56,6 @@ const ProjectEdit = () => {
         resumo: project.resumo || '',
         palavras_chave: project.palavras_chave || '',
         categoria: project.categoria,
-        subcategoria: project.subcategoria || '',
       });
     } else {
       navigate('/projects');
@@ -72,10 +69,7 @@ const ProjectEdit = () => {
     
     setSubmitting(true);
     
-    const success = await updateProject(id, {
-      ...data,
-      subcategoria: data.subcategoria || undefined,
-    });
+    const success = await updateProject(id, data);
     
     if (success) {
       navigate(`/projects/${id}`);
@@ -184,30 +178,6 @@ const ProjectEdit = () => {
                   )}
                 />
 
-                {/* Subcategoria */}
-                {form.watch('categoria') === 'II' && (
-                  <FormField
-                    control={form.control}
-                    name="subcategoria"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Subcategoria</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a subcategoria" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="II_a">II-a: 1º ao 3º ano</SelectItem>
-                            <SelectItem value="II_b">II-b: 4º ao 6º ano</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </div>
 
               {/* Resumo */}

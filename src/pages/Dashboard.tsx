@@ -1,15 +1,17 @@
 import { useUserPermissions } from "@/hooks/useUserRole";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Sidebar } from "@/components/Sidebar";
 import { DashboardStats } from "@/components/DashboardStats";
 import { ModuleCards } from "@/components/ModuleCards";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Clock, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Clock, CheckCircle, FlaskConical, Plus } from "lucide-react";
 
 const Dashboard = () => {
-  const { userRole, status } = useUserPermissions();
+  const { userRole, status, isAdmin } = useUserPermissions();
+  const navigate = useNavigate();
 
   // Se o usuário está pendente de aprovação
   if (status === 'pendente') {
@@ -119,15 +121,64 @@ const Dashboard = () => {
           )}
 
           {/* Conditional dashboard components based on user role */}
-          {(userRole === 'admin_staff' || userRole === 'coordenador_admin' || userRole === 'diretor') && (
+          {isAdmin() && (
             <>
               <DashboardStats />
               <ModuleCards />
             </>
           )}
           
-          {(userRole === 'autor' || userRole === 'orientador' || userRole === 'coorientador') && (
-            <ModuleCards />
+          {/* Limited cards for autor/orientador */}
+          {(userRole === 'autor' || userRole === 'orientador' || userRole === 'coorientador') && !isAdmin() && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Seus Módulos</h2>
+                <p className="text-muted-foreground">Gerencie seus projetos</p>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary cursor-pointer" onClick={() => navigate('/projects')}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-green-500/10">
+                          <FlaskConical className="w-5 h-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">Meus Projetos</CardTitle>
+                      </div>
+                    </div>
+                    <CardDescription className="text-sm mt-2">
+                      Visualize e gerencie seus projetos submetidos
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full" variant="outline" onClick={(e) => { e.stopPropagation(); navigate('/projects'); }}>
+                      Ver Projetos
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-primary cursor-pointer" onClick={() => navigate('/projects/new')}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-500/10">
+                          <Plus className="w-5 h-5 text-primary" />
+                        </div>
+                        <CardTitle className="text-lg">Novo Projeto</CardTitle>
+                      </div>
+                    </div>
+                    <CardDescription className="text-sm mt-2">
+                      Crie e submeta um novo projeto para a feira
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button className="w-full" variant="outline" onClick={(e) => { e.stopPropagation(); navigate('/projects/new'); }}>
+                      Criar Projeto
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           )}
         </main>
       </div>
