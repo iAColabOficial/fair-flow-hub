@@ -1220,6 +1220,7 @@ export type Database = {
         | "VII"
         | "VIII"
         | "RELATO"
+        | "IX"
       project_status:
         | "rascunho"
         | "submetido"
@@ -1412,6 +1413,7 @@ export const Constants = {
         "VII",
         "VIII",
         "RELATO",
+        "IX",
       ],
       project_status: [
         "rascunho",
