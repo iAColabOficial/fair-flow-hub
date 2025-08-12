@@ -42,14 +42,14 @@ export const Sidebar = ({ className }: SidebarProps) => {
       href: "/users",
       current: location.pathname === "/users",
       badge: "12",
-      show: canManageUsers,
+      show: isAdmin(),
     },
     {
       name: "Atribuir Cargos",
       icon: UserPlus,
       href: "/assign-roles",
       current: location.pathname === "/assign-roles",
-      show: canManageUsers,
+      show: isAdmin(),
     },
     {
       name: "Projetos",
@@ -65,14 +65,14 @@ export const Sidebar = ({ className }: SidebarProps) => {
       href: "/evaluations",
       current: location.pathname.startsWith("/evaluations"),
       badge: "8",
-      show: canEvaluate,
+      show: isAdmin(),
     },
     {
       name: "Financeiro",
       icon: CreditCard,
       href: "/financial",
       current: location.pathname.startsWith("/financial"),
-      show: canManageFinancial,
+      show: isAdmin(),
     },
     {
       name: "Comunicação",
@@ -93,7 +93,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       icon: BarChart3,
       href: "/reports",
       current: location.pathname.startsWith("/reports"),
-      show: canViewReports,
+      show: isAdmin(),
     },
     {
       name: "Certificados",
@@ -115,7 +115,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       name: "Adicionar Usuário",
       icon: Users,
       href: "/users/new",
-      show: canManageUsers,
+      show: isAdmin(),
     },
     {
       name: "Criar Evento",
