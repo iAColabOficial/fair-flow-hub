@@ -20,7 +20,6 @@ import { getCategoryLimits } from '@/utils/categoryLimits';
 interface ProjectSubmissionForm {
   title: string;
   category: ProjectCategoria;
-  subcategory?: string;
   area_conhecimento_id: string;
   resumo: string;
   palavras_chave: string;
@@ -37,19 +36,15 @@ interface ProjectSubmissionForm {
 
 const categories = [
   { value: "I", label: "Categoria I - Educação infantil (pré-escolar)" },
-  { value: "II", label: "Categoria II - Estudantes do Ensino Fundamental (1º ao 3º ano)", hasSubcategory: true },
+  { value: "II", label: "Categoria II - Estudantes do Ensino Fundamental (1º ao 3º ano)" },
   { value: "III", label: "Categoria III - Estudantes do Ensino Fundamental (4º ao 6º ano)" },
   { value: "IV", label: "Categoria IV - Estudantes do Ensino Fundamental (7º ao 9º ano)" },
   { value: "V", label: "Categoria V - Ensino médio e/ou técnico profissionalizante concomitante" },
   { value: "VI", label: "Categoria VI - Cursos técnicos pós médio" },
   { value: "VII", label: "Categoria VII - Educação de Jovens e adultos" },
   { value: "VIII", label: "Categoria VIII - Ensino superior" },
-  { value: "IX", label: "Categoria IX - Pós Graduações" }
-];
-
-const subcategories = [
-  { value: "II_a", label: "Categoria II-a - Estudantes do Ensino Fundamental (1º ao 3º ano)" },
-  { value: "II_b", label: "Categoria II-b - Estudantes do Ensino Fundamental (4º ao 6º ano)" }
+  { value: "IX", label: "Categoria IX - Pós Graduações" },
+  { value: "RELATO", label: "Relato de Experiência Científico-Pedagógica" }
 ];
 
 const specialRequirements = [
@@ -150,7 +145,6 @@ export default function ProjectSubmission() {
       const projectData = {
         titulo: data.title,
         categoria: data.category,
-        subcategoria: data.subcategory as 'II_a' | 'II_b' | null,
         area_conhecimento_id: data.area_conhecimento_id,
         resumo: data.resumo,
         palavras_chave: data.palavras_chave,
@@ -338,33 +332,6 @@ export default function ProjectSubmission() {
                     )}
                   />
 
-                  {/* Subcategory for Category II */}
-                  {selectedCategory === 'II' && (
-                    <FormField
-                      control={form.control}
-                      name="subcategory"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Subcategoria</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione uma subcategoria" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {subcategories.map((subcategory) => (
-                                <SelectItem key={subcategory.value} value={subcategory.value}>
-                                  {subcategory.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
 
                   <FormField
                     control={form.control}

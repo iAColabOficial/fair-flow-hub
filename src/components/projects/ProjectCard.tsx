@@ -20,14 +20,13 @@ export const ProjectCard = ({ project, onDelete, showActions = true }: ProjectCa
     <Card className="h-full flex flex-col">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg line-clamp-2">{project.titulo}</CardTitle>
+          <CardTitle className="text-lg line-clamp-2">
+            {project.categoria}{project.id.slice(0, 8).toUpperCase()}{project.areas_conhecimento?.codigo_cnpq || 'XX'} - {project.titulo}
+          </CardTitle>
           <ProjectStatusBadge status={project.status} />
         </div>
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">Categoria {project.categoria}</Badge>
-          {project.subcategoria && (
-            <Badge variant="outline">{project.subcategoria}</Badge>
-          )}
           {project.is_credenciado && (
             <Badge variant="secondary">Credenciado</Badge>
           )}
