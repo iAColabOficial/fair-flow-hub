@@ -13,10 +13,13 @@ import { Upload, FileText, Users, Building, BookOpen, AlertCircle } from 'lucide
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ProjectCategoria } from '@/types/database';
+import { UserSearchSelect } from '@/components/UserSearchSelect';
+import { User } from '@/hooks/useUsers';
+import { getCategoryLimits } from '@/utils/categoryLimits';
 
 interface ProjectSubmissionForm {
   title: string;
-  category: string;
+  category: ProjectCategoria;
   subcategory?: string;
   area_conhecimento_id: string;
   resumo: string;
@@ -26,9 +29,9 @@ interface ProjectSubmissionForm {
   institutionCity: string;
   isPublicInstitution: boolean;
   isFullTimeInstitution: boolean;
-  authors: string;
-  advisor: string;
-  coAdvisor?: string;
+  members: User[];
+  advisor: User | null;
+  coAdvisor?: User | null;
   specialRequirements: string[];
 }
 
@@ -114,22 +117,95 @@ export default function ProjectSubmission() {
         return;
       }
 
+      // Validate team composition based on category
+      const categoryLimits = getCategoryLimits(data.category);
+      
+      if (categoryLimits.requiresAdvisor && !data.advisor) {
+        toast({
+          title: "Erro",
+          description: "É obrigatório ter um orientador para esta categoria",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (data.members.length > categoryLimits.maxMembers) {
+        toast({
+          title: "Erro",
+          description: `Esta categoria permite no máximo ${categoryLimits.maxMembers} integrantes`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (data.members.length === 0) {
+        toast({
+          title: "Erro",
+          description: "É necessário ter pelo menos um membro na equipe",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const projectData = {
         titulo: data.title,
-        categoria: data.category as ProjectCategoria,
+        categoria: data.category,
         subcategoria: data.subcategory as 'II_a' | 'II_b' | null,
         area_conhecimento_id: data.area_conhecimento_id,
         resumo: data.resumo,
         palavras_chave: data.palavras_chave,
-        status: 'rascunho' as 'rascunho',
+        status: 'rascunho' as const,
         created_by: user.user.id
       };
 
-      const { error } = await supabase
+      const { data: project, error } = await supabase
         .from('projects')
-        .insert(projectData);
+        .insert(projectData)
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Insert project members
+      if (data.members.length > 0) {
+        const membersData = data.members.map(member => ({
+          project_id: project.id,
+          user_id: member.id,
+          role: 'autor' as const
+        }));
+
+        const { error: membersError } = await supabase
+          .from('project_members')
+          .insert(membersData);
+
+        if (membersError) throw membersError;
+      }
+
+      // Insert advisor
+      if (data.advisor) {
+        const { error: advisorError } = await supabase
+          .from('project_orientadores')
+          .insert({
+            project_id: project.id,
+            user_id: data.advisor.id,
+            tipo: 'orientador' as const
+          });
+
+        if (advisorError) throw advisorError;
+      }
+
+      // Insert co-advisor if exists
+      if (data.coAdvisor) {
+        const { error: coAdvisorError } = await supabase
+          .from('project_orientadores')
+          .insert({
+            project_id: project.id,
+            user_id: data.coAdvisor.id,
+            tipo: 'coorientador' as const
+          });
+
+        if (coAdvisorError) throw coAdvisorError;
+      }
 
       toast({
         title: "Sucesso!",
@@ -489,58 +565,110 @@ export default function ProjectSubmission() {
                     Equipe do Projeto
                   </CardTitle>
                   <CardDescription>
-                    Informe os participantes do projeto
+                    Selecione os participantes do projeto
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
+                  {/* Category Limits Info */}
+                  {selectedCategory && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <h4 className="font-semibold text-sm">Limites da Categoria</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {getCategoryLimits(selectedCategory as ProjectCategoria).description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Team Members */}
                   <FormField
                     control={form.control}
-                    name="authors"
+                    name="members"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Autores do Projeto</FormLabel>
+                        <FormLabel>
+                          Integrantes da Equipe
+                          {selectedCategory && (
+                            <span className="text-muted-foreground text-sm ml-2">
+                              (máx. {getCategoryLimits(selectedCategory as ProjectCategoria).maxMembers})
+                            </span>
+                          )}
+                        </FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Liste os nomes dos autores do projeto"
-                            className="min-h-[100px]"
-                            {...field} 
+                          <UserSearchSelect
+                            selectedUsers={field.value || []}
+                            onUsersChange={field.onChange}
+                            maxUsers={selectedCategory ? getCategoryLimits(selectedCategory as ProjectCategoria).maxMembers : undefined}
+                            placeholder="Buscar integrantes..."
+                            label=""
                           />
                         </FormControl>
                         <FormDescription>
-                          Liste todos os estudantes autores do projeto
+                          Busque e selecione os integrantes da equipe pelo nome, email ou CPF
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  {/* Advisor */}
                   <FormField
                     control={form.control}
                     name="advisor"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Orientador</FormLabel>
+                        <FormLabel>
+                          Orientador
+                          {selectedCategory && getCategoryLimits(selectedCategory as ProjectCategoria).requiresAdvisor && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Nome do orientador" {...field} />
+                          <UserSearchSelect
+                            selectedUsers={field.value ? [field.value] : []}
+                            onUsersChange={(users) => field.onChange(users[0] || null)}
+                            maxUsers={1}
+                            placeholder="Buscar orientador..."
+                            label=""
+                          />
                         </FormControl>
+                        <FormDescription>
+                          Profissional da Educação responsável pela orientação do projeto
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="coAdvisor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Coorientador (Opcional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome do coorientador" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Co-Advisor */}
+                  {selectedCategory && getCategoryLimits(selectedCategory as ProjectCategoria).allowsCoAdvisor && (
+                    <FormField
+                      control={form.control}
+                      name="coAdvisor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Coorientador (Opcional)</FormLabel>
+                          <FormControl>
+                            <UserSearchSelect
+                              selectedUsers={field.value ? [field.value] : []}
+                              onUsersChange={(users) => field.onChange(users[0] || null)}
+                              maxUsers={1}
+                              placeholder="Buscar coorientador..."
+                              label=""
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Profissional que auxiliará na orientação do projeto (opcional)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </CardContent>
               </Card>
             )}
