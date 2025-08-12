@@ -65,7 +65,7 @@ const ProjectList = () => {
           <p className="text-muted-foreground">Gerencie seus projetos FEBIC</p>
         </div>
         <Button asChild>
-          <Link to="/projects/submission">
+          <Link to="/projects/new">
             <Plus className="h-4 w-4 mr-2" />
             Novo Projeto
           </Link>
@@ -144,7 +144,7 @@ const ProjectList = () => {
               </p>
               {projects.length === 0 && (
                 <Button asChild>
-                  <Link to="/projects/submission">
+                  <Link to="/projects/new">
                     <Plus className="h-4 w-4 mr-2" />
                     Criar Primeiro Projeto
                   </Link>
