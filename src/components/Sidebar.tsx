@@ -26,7 +26,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ className }: SidebarProps) => {
   const location = useLocation();
-  const { canManageUsers, canManageProjects, canEvaluate, canManageFinancial, canViewReports } = useUserPermissions();
+  const { canManageUsers, canManageProjects, canEvaluate, canManageFinancial, canViewReports, userRole, isAdmin } = useUserPermissions();
 
   const navigation = [
     {
@@ -79,14 +79,14 @@ export const Sidebar = ({ className }: SidebarProps) => {
       icon: MessageSquare,
       href: "/communication",
       current: location.pathname.startsWith("/communication"),
-      show: true,
+      show: isAdmin(),
     },
     {
       name: "Eventos",
       icon: Calendar,
       href: "/events",
       current: location.pathname.startsWith("/events"),
-      show: true,
+      show: isAdmin(),
     },
     {
       name: "Relatórios",
@@ -100,7 +100,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       icon: Award,
       href: "/certificates",
       current: location.pathname.startsWith("/certificates"),
-      show: true,
+      show: isAdmin(),
     },
   ].filter(item => item.show);
 
@@ -121,7 +121,7 @@ export const Sidebar = ({ className }: SidebarProps) => {
       name: "Criar Evento",
       icon: Calendar,
       href: "/events/new",
-      show: true,
+      show: isAdmin(),
     },
   ].filter(action => action.show);
   return (
