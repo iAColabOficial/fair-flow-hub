@@ -48,7 +48,7 @@ const Home = () => {
             <img src={febicLogo} alt="FEBIC" className="h-8 w-auto" />
             <div>
               <h1 className="text-lg font-bold text-foreground">FEBIC</h1>
-              <p className="text-xs text-muted-foreground">Plataforma Feira de Ciências</p>
+              <p className="text-xs text-muted-foreground">Feira Brasileira de Iniciação Ciêntifica</p>
             </div>
           </div>
 
@@ -161,7 +161,7 @@ const Home = () => {
             <span className="text-lg font-bold text-foreground">FEBIC</span>
           </div>
           <p className="text-muted-foreground">
-            © 2025 FEBIC. Todos os direitos reservados. Plataforma de Gestão de Feira de Ciências.
+            © 2025 FEBIC. Todos os direitos reservados. Feira Brasileira de Iniciação Ciêntifica.
           </p>
         </div>
       </footer>

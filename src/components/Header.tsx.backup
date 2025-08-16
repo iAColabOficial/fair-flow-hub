@@ -11,26 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { useUnreadNotificationsCount } from "@/hooks/useNotifications";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { useNavigate } from "react-router-dom";
 import febicLogo from "@/assets/febic-logo.png";
 
 export const Header = () => {
   const { user, signOut } = useAuth();
-  const { data: unreadCount = 0 } = useUnreadNotificationsCount();
-  const navigate = useNavigate();
-  
+
   const getUserInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
-  };
-
-  const handleProfileClick = () => {
-    navigate("/profile");
-  };
-
-  const handleSettingsClick = () => {
-    navigate("/settings");
   };
 
   return (
@@ -45,17 +33,15 @@ export const Header = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="icon" className="relative">
                 <Bell className="h-4 w-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs flex items-center justify-center text-destructive-foreground">
-                    {unreadCount}
-                  </span>
-                )}
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs flex items-center justify-center text-destructive-foreground">
+                  3
+                </span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-96 p-0" align="end">
@@ -86,11 +72,11 @@ export const Header = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleProfileClick}>
+              <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
                 <span>Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSettingsClick}>
+              <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Configurações</span>
               </DropdownMenuItem>

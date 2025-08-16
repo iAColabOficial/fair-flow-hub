@@ -12,6 +12,8 @@ import UsersPage from "./pages/UsersPage";
 import AssignRolesPage from "./pages/AssignRolesPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import Profile from "./pages/user/Profile";
+import UserSettings from "./pages/user/Settings";
 import NotFound from "./pages/NotFound";
 
 // Module Pages
@@ -117,6 +119,17 @@ const App = () => (
             <Route path="/admin/schedule" element={
               <ProtectedRoute>
                 <ScheduleManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <UserSettings />
               </ProtectedRoute>
             } />
             

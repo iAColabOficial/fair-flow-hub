@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useUsers, User } from '@/hooks/useUsers';
+import { useUsers, useOrientadores, User } from '@/hooks/useUsers';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface UserSearchSelectProps {
@@ -14,21 +14,32 @@ interface UserSearchSelectProps {
   placeholder?: string;
   label?: string;
   disabled?: boolean;
+  // NOVA PROP: Para especificar se é busca de orientadores
+  searchType?: 'users' | 'orientadores';
 }
 
 export function UserSearchSelect({
   selectedUsers,
   onUsersChange,
   maxUsers,
-  placeholder = "Buscar usuários...",
+  placeholder,
   label,
-  disabled = false
+  disabled = false,
+  searchType = 'users' // Default para users (não quebra código existente)
 }: UserSearchSelectProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const debouncedSearch = useDebounce(searchTerm, 300);
   
-  const { data: users = [], isLoading } = useUsers(debouncedSearch);
+  // MODIFICAÇÃO: Usar hook apropriado baseado no searchType
+  const { data: users = [], isLoading } = searchType === 'orientadores' 
+    ? useOrientadores(debouncedSearch)
+    : useUsers(debouncedSearch);
+
+  // MODIFICAÇÃO: Placeholder dinâmico baseado no tipo de busca
+  const defaultPlaceholder = searchType === 'orientadores' 
+    ? "Buscar orientador por CPF..." 
+    : "Buscar usuários...";
 
   const handleUserSelect = (user: User) => {
     if (selectedUsers.find(u => u.id === user.id)) return;
@@ -49,6 +60,9 @@ export function UserSearchSelect({
   );
 
   const canAddMore = !maxUsers || selectedUsers.length < maxUsers;
+
+  // MODIFICAÇÃO: Tamanho mínimo da busca baseado no tipo
+  const minSearchLength = searchType === 'orientadores' ? 3 : 2;
 
   return (
     <div className="space-y-3">
@@ -85,13 +99,13 @@ export function UserSearchSelect({
                 setIsSearchOpen(true);
               }}
               onFocus={() => setIsSearchOpen(true)}
-              placeholder={placeholder}
+              placeholder={placeholder || defaultPlaceholder}
               className="pl-10"
             />
           </div>
 
           {/* Search Results */}
-          {isSearchOpen && searchTerm.length >= 2 && (
+          {isSearchOpen && searchTerm.length >= minSearchLength && (
             <Card className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto">
               <CardContent className="p-2">
                 {isLoading ? (
@@ -100,7 +114,9 @@ export function UserSearchSelect({
                   </div>
                 ) : availableUsers.length === 0 ? (
                   <div className="text-center py-2 text-muted-foreground">
-                    Nenhum usuário encontrado
+                    {searchType === 'orientadores' 
+                      ? 'Nenhum orientador encontrado' 
+                      : 'Nenhum usuário encontrado'}
                   </div>
                 ) : (
                   <div className="space-y-1">
@@ -113,7 +129,12 @@ export function UserSearchSelect({
                       >
                         <div className="font-medium">{user.nome}</div>
                         <div className="text-sm text-muted-foreground">
-                          {user.email}
+                          {/* MODIFICAÇÃO: Mostrar CPF mascarado ou completo baseado na busca */}
+                          {searchType === 'orientadores' 
+                            ? `CPF: ${debouncedSearch && debouncedSearch.replace(/[^0-9]/g, '').length >= 11 
+                                ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+                                : `***.***.***-${user.cpf.slice(-2)}`}`
+                            : user.email}
                         </div>
                       </button>
                     ))}

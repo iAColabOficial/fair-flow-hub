@@ -1,0 +1,261 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { Sidebar } from "@/components/Sidebar";
+import { Header } from "@/components/Header";
+import { Save, User, Loader2 } from "lucide-react";
+import { formatCPF, formatPhone } from "@/lib/utils";
+
+export const Profile = () => {
+  const { userProfile, isLoading, updateProfile, isUpdating } = useUserProfile();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    nome: "",
+    telefone: "",
+    data_nascimento: "",
+    endereco_completo: "",
+    instituicao: "",
+    nivel_escolar: "",
+    formacao_academica: "",
+    area_atuacao: "",
+    curriculo_lattes: "",
+  });
+
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        nome: userProfile.nome || "",
+        telefone: userProfile.telefone || "",
+        data_nascimento: userProfile.data_nascimento || "",
+        endereco_completo: userProfile.endereco_completo || "",
+        instituicao: userProfile.instituicao || "",
+        nivel_escolar: userProfile.nivel_escolar || "",
+        formacao_academica: userProfile.formacao_academica || "",
+        area_atuacao: userProfile.area_atuacao || "",
+        curriculo_lattes: userProfile.curriculo_lattes || "",
+      });
+    }
+  }, [userProfile]);
+
+  const handleSave = () => {
+    updateProfile({
+      ...formData,
+      profile_id: userProfile?.profile_id,
+    });
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-muted/50">
+        <Header />
+        <div className="flex h-screen pt-16">
+          <Sidebar className="w-64 border-r" />
+          <main className="flex-1 overflow-y-auto p-6">
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-muted/50">
+      <Header />
+      <div className="flex h-screen pt-16">
+        <Sidebar className="w-64 border-r" />
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-3">
+              <User className="h-8 w-8" />
+              <div>
+                <h1 className="text-3xl font-bold">Meu Perfil</h1>
+                <p className="text-muted-foreground">Gerencie suas informações pessoais</p>
+              </div>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações Pessoais</CardTitle>
+                <CardDescription>
+                  Mantenha seus dados atualizados para melhor experiência na plataforma
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={userProfile?.email || ""}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cpf">CPF</Label>
+                    <Input
+                      id="cpf"
+                      value={formatCPF(userProfile?.cpf) || ""}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nome">Nome Completo</Label>
+                    <Input
+                      id="nome"
+                      value={formData.nome}
+                      onChange={(e) => handleInputChange('nome', e.target.value)}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="telefone">Telefone</Label>
+                    <Input
+                      id="telefone"
+                      value={formatPhone(formData.telefone)}
+                      onChange={(e) => handleInputChange('telefone', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="(11) 99999-9999"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="data_nascimento">Data de Nascimento</Label>
+                    <Input
+                      id="data_nascimento"
+                      type="date"
+                      value={formData.data_nascimento}
+                      onChange={(e) => handleInputChange('data_nascimento', e.target.value)}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="nivel_escolar">Nível Escolar</Label>
+                    <Select 
+                      value={formData.nivel_escolar} 
+                      onValueChange={(value) => handleInputChange('nivel_escolar', value)}
+                      disabled={!isEditing}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione seu nível" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="educacao_infantil">Educação Infantil</SelectItem>
+                        <SelectItem value="ensino_fundamental_i">Ensino Fundamental I</SelectItem>
+                        <SelectItem value="ensino_fundamental_ii">Ensino Fundamental II</SelectItem>
+                        <SelectItem value="ensino_medio">Ensino Médio</SelectItem>
+                        <SelectItem value="ensino_tecnico">Ensino Técnico</SelectItem>
+                        <SelectItem value="ensino_superior">Ensino Superior</SelectItem>
+                        <SelectItem value="pos_graduacao_lato">Pós-graduação Lato Sensu</SelectItem>
+                        <SelectItem value="pos_graduacao_stricto">Pós-graduação Stricto Sensu</SelectItem>
+                        <SelectItem value="outros">Outros</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="endereco_completo">Endereço Completo</Label>
+                  <Input
+                    id="endereco_completo"
+                    value={formData.endereco_completo}
+                    onChange={(e) => handleInputChange('endereco_completo', e.target.value)}
+                    disabled={!isEditing}
+                    placeholder="Rua, número, bairro, cidade, estado"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="instituicao">Instituição</Label>
+                    <Input
+                      id="instituicao"
+                      value={formData.instituicao}
+                      onChange={(e) => handleInputChange('instituicao', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Nome da escola/universidade"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="area_atuacao">Área de Atuação</Label>
+                    <Input
+                      id="area_atuacao"
+                      value={formData.area_atuacao}
+                      onChange={(e) => handleInputChange('area_atuacao', e.target.value)}
+                      disabled={!isEditing}
+                      placeholder="Ex: Ciências da Natureza"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="formacao_academica">Formação Acadêmica</Label>
+                  <Input
+                    id="formacao_academica"
+                    value={formData.formacao_academica}
+                    onChange={(e) => handleInputChange('formacao_academica', e.target.value)}
+                    disabled={!isEditing}
+                    placeholder="Ex: Licenciatura em Biologia"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="curriculo_lattes">Currículo Lattes (URL)</Label>
+                  <Input
+                    id="curriculo_lattes"
+                    value={formData.curriculo_lattes}
+                    onChange={(e) => handleInputChange('curriculo_lattes', e.target.value)}
+                    disabled={!isEditing}
+                    placeholder="http://lattes.cnpq.br/..."
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  {isEditing ? (
+                    <>
+                      <Button onClick={handleSave} disabled={isUpdating}>
+                        {isUpdating ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="mr-2 h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                      <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isUpdating}>
+                        Cancelar
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={() => setIsEditing(true)}>
+                      Editar Perfil
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;

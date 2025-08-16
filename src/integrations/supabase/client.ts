@@ -2,12 +2,17 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://jdfgpurijchvhymbwffk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkZmdwdXJpamNodmh5bWJ3ZmZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0NzY5MjQsImV4cCI6MjA2NDA1MjkyNH0.5jcL958mThyPIzoVA1I7IXcwkQinlUoJGZvrkJnkEgU";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://febic.ibicsc.com.br/api";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE";
+
+// Debug logs para verificar configuração
+console.log('🔧 SUPABASE CONFIG (integrations):', {
+  url: SUPABASE_URL,
+  key: SUPABASE_PUBLISHABLE_KEY.substring(0, 20) + '...'
+});
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
-
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,

@@ -107,7 +107,7 @@ const Dashboard = () => {
               Painel FEBIC - {userRole}
             </h1>
             <p className="text-muted-foreground text-lg">
-              Bem-vindo à Plataforma de Gestão da Feira de Iniciação Científica
+              Bem-vindo à Plataforma da Feira Brasileira de Iniciação Ciêntifica
             </p>
           </div>
 

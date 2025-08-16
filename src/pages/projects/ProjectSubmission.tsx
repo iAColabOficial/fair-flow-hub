@@ -16,6 +16,7 @@ import { ProjectCategoria } from '@/types/database';
 import { UserSearchSelect } from '@/components/UserSearchSelect';
 import { User } from '@/hooks/useUsers';
 import { getCategoryLimits } from '@/utils/categoryLimits';
+import { EstadoCidadeSelect } from '@/components/ui/estado-cidade-select';
 
 interface ProjectSubmissionForm {
   title: string;
@@ -62,7 +63,7 @@ export default function ProjectSubmission() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const { toast } = useToast();
-  
+
   const form = useForm<ProjectSubmissionForm>();
 
   // Fetch knowledge areas from database
@@ -75,7 +76,7 @@ export default function ProjectSubmission() {
         .eq('nivel', 'area')
         .eq('is_active', true)
         .order('nome');
-      
+
       if (error) throw error;
       return data;
     }
@@ -86,7 +87,7 @@ export default function ProjectSubmission() {
     queryKey: ['sub-areas', selectedArea],
     queryFn: async () => {
       if (!selectedArea) return [];
-      
+
       const { data, error } = await supabase
         .from('areas_conhecimento')
         .select('*')
@@ -94,7 +95,7 @@ export default function ProjectSubmission() {
         .eq('parent_id', selectedArea)
         .eq('is_active', true)
         .order('nome');
-      
+
       if (error) throw error;
       return data;
     },
@@ -115,7 +116,7 @@ export default function ProjectSubmission() {
 
       // Validate team composition based on category
       const categoryLimits = getCategoryLimits(data.category);
-      
+
       if (categoryLimits.requiresAdvisor && !data.advisor) {
         toast({
           title: "Erro",
@@ -253,14 +254,13 @@ export default function ProjectSubmission() {
               const Icon = step.icon;
               const isActive = currentStep === step.number;
               const isCompleted = currentStep > step.number;
-              
+
               return (
                 <div key={step.number} className="flex items-center">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                    isActive ? 'border-primary bg-primary text-primary-foreground' :
-                    isCompleted ? 'border-primary bg-primary text-primary-foreground' :
-                    'border-muted-foreground bg-background text-muted-foreground'
-                  }`}>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${isActive ? 'border-primary bg-primary text-primary-foreground' :
+                      isCompleted ? 'border-primary bg-primary text-primary-foreground' :
+                        'border-muted-foreground bg-background text-muted-foreground'
+                    }`}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="ml-2 hidden sm:block">
@@ -279,7 +279,7 @@ export default function ProjectSubmission() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
+
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <Card>
@@ -342,11 +342,11 @@ export default function ProjectSubmission() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Área do Conhecimento CNPQ</FormLabel>
-                        <Select 
+                        <Select
                           onValueChange={(value) => {
                             setSelectedArea(value);
                             field.onChange(value);
-                          }} 
+                          }}
                           defaultValue={field.value}
                           disabled={areasLoading}
                         >
@@ -376,8 +376,8 @@ export default function ProjectSubmission() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Subárea do Conhecimento</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                             disabled={subAreasLoading}
                           >
@@ -410,9 +410,9 @@ export default function ProjectSubmission() {
                       <FormItem>
                         <FormLabel>Token de Projeto Credenciado (Opcional)</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Digite o token se o projeto foi credenciado por outra feira" 
-                            {...field} 
+                          <Input
+                            placeholder="Digite o token se o projeto foi credenciado por outra feira"
+                            {...field}
                           />
                         </FormControl>
                         <FormDescription>
@@ -465,33 +465,13 @@ export default function ProjectSubmission() {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="institutionState"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Estado</FormLabel>
-                          <FormControl>
-                            <Input placeholder="UF" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="institutionCity"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cidade</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Digite a cidade" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  <div>
+                    <FormLabel>Estado e Cidade</FormLabel>
+                    <EstadoCidadeSelect
+                      selectedEstado={form.watch('institutionState')}
+                      selectedCidade={form.watch('institutionCity')}
+                      onEstadoChange={(estado) => form.setValue('institutionState', estado)}
+                      onCidadeChange={(cidade) => form.setValue('institutionCity', cidade)}
                     />
                   </div>
 
@@ -531,16 +511,6 @@ export default function ProjectSubmission() {
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-sm mb-2">Cotas de Seleção</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• 55% das vagas para projetos de escolas públicas</li>
-                      <li>• Até 15% das vagas para projetos de Santa Catarina</li>
-                      <li>• Até 10% das vagas para escolas públicas de período integral</li>
-                      <li>• Até 10% das vagas para grupos de diversidade</li>
-                    </ul>
                   </div>
                 </CardContent>
               </Card>
@@ -598,7 +568,7 @@ export default function ProjectSubmission() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Busque e selecione os integrantes da equipe pelo nome, email ou CPF
+                          Busque e selecione os integrantes da equipe
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -622,8 +592,9 @@ export default function ProjectSubmission() {
                             selectedUsers={field.value ? [field.value] : []}
                             onUsersChange={(users) => field.onChange(users[0] || null)}
                             maxUsers={1}
-                            placeholder="Buscar orientador..."
+                            placeholder="Buscar orientador por CPF..."
                             label=""
+                            searchType="orientadores"
                           />
                         </FormControl>
                         <FormDescription>
@@ -644,11 +615,12 @@ export default function ProjectSubmission() {
                           <FormLabel>Coorientador (Opcional)</FormLabel>
                           <FormControl>
                             <UserSearchSelect
-                              selectedUsers={field.value ? [field.value] : []}
-                              onUsersChange={(users) => field.onChange(users[0] || null)}
-                              maxUsers={1}
-                              placeholder="Buscar coorientador..."
+                              selectedUsers={field.value || []}
+                              onUsersChange={field.onChange}
+                              maxUsers={selectedCategory ? getCategoryLimits(selectedCategory as ProjectCategoria).maxMembers : undefined}
+                              placeholder="Buscar integrantes por CPF..."
                               label=""
+                              searchType="autores"
                             />
                           </FormControl>
                           <FormDescription>
@@ -683,10 +655,10 @@ export default function ProjectSubmission() {
                       <FormItem>
                         <FormLabel>Resumo</FormLabel>
                         <FormControl>
-                          <Textarea 
+                          <Textarea
                             placeholder="Resumo do projeto (1000-2500 caracteres)"
                             className="min-h-[150px]"
-                            {...field} 
+                            {...field}
                           />
                         </FormControl>
                         <FormDescription>
