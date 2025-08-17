@@ -615,12 +615,12 @@ export default function ProjectSubmission() {
                           <FormLabel>Coorientador (Opcional)</FormLabel>
                           <FormControl>
                             <UserSearchSelect
-                              selectedUsers={field.value || []}
-                              onUsersChange={field.onChange}
-                              maxUsers={selectedCategory ? getCategoryLimits(selectedCategory as ProjectCategoria).maxMembers : undefined}
-                              placeholder="Buscar integrantes por CPF..."
+                              selectedUsers={field.value ? [field.value] : []}
+                              onUsersChange={(users) => field.onChange(users[0] || null)}
+                              maxUsers={1}
+                              placeholder="Buscar coorientador por CPF..."
                               label=""
-                              searchType="autores"
+                              searchType="orientadores"
                             />
                           </FormControl>
                           <FormDescription>

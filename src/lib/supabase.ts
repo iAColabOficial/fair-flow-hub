@@ -10,7 +10,7 @@ console.log('SUPABASE_KEY:', supabaseAnonKey);
 
 // Forçar uso em runtime
 if (typeof window !== 'undefined') {
-  window.SUPABASE_CONFIG = { url: supabaseUrl, key: supabaseAnonKey };
+  (window as any).SUPABASE_CONFIG = { url: supabaseUrl, key: supabaseAnonKey };
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)

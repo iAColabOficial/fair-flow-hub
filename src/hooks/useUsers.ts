@@ -41,7 +41,7 @@ export function useUsers(searchTerm?: string) {
     },
     enabled: !searchTerm || searchTerm.length >= 2,
     staleTime: 1000 * 60 * 5, // 5 minutos
-    cacheTime: 1000 * 60 * 10 // 10 minutos
+    gcTime: 1000 * 60 * 10 // 10 minutos
   });
 }
 
@@ -53,10 +53,16 @@ export function useOrientadores(cpfSearch?: string) {
       try {
         console.log('🎯 [ORIENTADORES] Buscando orientadores com CPF:', cpfSearch);
 
-        // Consulta otimizada na VIEW orientadores_ativos (sem JOINs complexos)
+        // Query the users table directly with role filtering
         let query = supabase
-          .from('orientadores_ativos')
-          .select('id, nome, email, cpf');
+          .from('users')
+          .select(`
+            id, nome, email, cpf,
+            user_roles!inner(role_type, status)
+          `)
+          .eq('is_active', true)
+          .eq('user_roles.role_type', 'orientador')
+          .eq('user_roles.status', 'ativo');
 
         // Filtrar APENAS por CPF (busca segura)
         if (cpfSearch && cpfSearch.length >= 3) {
@@ -72,10 +78,18 @@ export function useOrientadores(cpfSearch?: string) {
           throw error;
         }
 
-        console.log('👥 Orientadores encontrados:', data?.length || 0);
-        console.log('✅ Resultado orientadores:', data || []);
+        // Map the joined data to the expected format
+        const mappedData = (data || []).map(user => ({
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          cpf: user.cpf
+        }));
+
+        console.log('👥 Orientadores encontrados:', mappedData.length);
+        console.log('✅ Resultado orientadores:', mappedData);
         
-        return data || [];
+        return mappedData;
 
       } catch (error) {
         console.error('💥 Erro geral orientadores:', error);
@@ -84,7 +98,7 @@ export function useOrientadores(cpfSearch?: string) {
     },
     enabled: !cpfSearch || cpfSearch.length >= 3, // Mínimo 3 dígitos do CPF
     staleTime: 1000 * 60 * 5, // 5 minutos (orientadores mudam pouco)
-    cacheTime: 1000 * 60 * 10 // 10 minutos
+    gcTime: 1000 * 60 * 10 // 10 minutos
   });
 }
 
@@ -96,10 +110,16 @@ export function useAutores(cpfSearch?: string) {
       try {
         console.log('👤 [AUTORES] Buscando autores com CPF:', cpfSearch);
 
-        // Consulta otimizada na VIEW autores_ativos (apenas role "autor")
+        // Query the users table directly with role filtering for authors
         let query = supabase
-          .from('autores_ativos')
-          .select('id, nome, email, cpf');
+          .from('users')
+          .select(`
+            id, nome, email, cpf,
+            user_roles!inner(role_type, status)
+          `)
+          .eq('is_active', true)
+          .eq('user_roles.role_type', 'autor')
+          .eq('user_roles.status', 'ativo');
 
         // Filtrar APENAS por CPF (não por nome para segurança)
         if (cpfSearch && cpfSearch.length >= 3) {
@@ -115,10 +135,18 @@ export function useAutores(cpfSearch?: string) {
           throw error;
         }
 
-        console.log('👥 Autores encontrados:', data?.length || 0);
-        console.log('✅ Resultado autores:', data || []);
+        // Map the joined data to the expected format
+        const mappedData = (data || []).map(user => ({
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          cpf: user.cpf
+        }));
+
+        console.log('👥 Autores encontrados:', mappedData.length);
+        console.log('✅ Resultado autores:', mappedData);
         
-        return data || [];
+        return mappedData;
 
       } catch (error) {
         console.error('💥 Erro geral autores:', error);
@@ -127,7 +155,7 @@ export function useAutores(cpfSearch?: string) {
     },
     enabled: !cpfSearch || cpfSearch.length >= 3, // Mínimo 3 dígitos do CPF
     staleTime: 1000 * 60 * 2, // 2 minutos (autores podem mudar mais)
-    cacheTime: 1000 * 60 * 5 // 5 minutos
+    gcTime: 1000 * 60 * 5 // 5 minutos
   });
 }
 
@@ -139,27 +167,16 @@ export function useUsersByRole(role: 'autor' | 'orientador' | 'avaliador' | 'adm
       try {
         console.log(`🎭 [ROLE-${role.toUpperCase()}] Buscando usuários:`, searchTerm);
 
-        // Usar VIEW específica se disponível, senão fazer JOIN
-        const viewName = role === 'orientador' ? 'orientadores_ativos' : 
-                        role === 'autor' ? 'autores_ativos' : null;
-
-        let query;
-        
-        if (viewName) {
-          // Usar VIEW otimizada
-          query = supabase.from(viewName).select('id, nome, email, cpf');
-        } else {
-          // Fazer JOIN apenas quando necessário
-          query = supabase
-            .from('users')
-            .select(`
-              id, nome, email, cpf,
-              user_roles!inner(role_type, status)
-            `)
-            .eq('is_active', true)
-            .eq('user_roles.role_type', role)
-            .eq('user_roles.status', 'ativo');
-        }
+        // Always use direct table queries with JOINs for consistency
+        let query = supabase
+          .from('users')
+          .select(`
+            id, nome, email, cpf,
+            user_roles!inner(role_type, status)
+          `)
+          .eq('is_active', true)
+          .eq('user_roles.role_type', role)
+          .eq('user_roles.status', 'ativo');
 
         if (searchTerm && searchTerm.length >= 2) {
           const cleanTerm = searchTerm.replace(/[^0-9]/g, '');
@@ -179,16 +196,16 @@ export function useUsersByRole(role: 'autor' | 'orientador' | 'avaliador' | 'adm
           throw error;
         }
 
-        // Mapear dados se veio de JOIN
-        const result = viewName ? data : (data || []).map(user => ({
+        // Map the joined data to the expected format
+        const result = (data || []).map(user => ({
           id: user.id,
           nome: user.nome,
           email: user.email,
           cpf: user.cpf
         }));
 
-        console.log(`👥 ${role} encontrados:`, result?.length || 0);
-        return result || [];
+        console.log(`👥 ${role} encontrados:`, result.length);
+        return result;
 
       } catch (error) {
         console.error(`💥 Erro geral ${role}:`, error);
@@ -197,6 +214,6 @@ export function useUsersByRole(role: 'autor' | 'orientador' | 'avaliador' | 'adm
     },
     enabled: !searchTerm || searchTerm.length >= 2,
     staleTime: 1000 * 60 * 3, // 3 minutos
-    cacheTime: 1000 * 60 * 8 // 8 minutos
+    gcTime: 1000 * 60 * 8 // 8 minutos
   });
 }

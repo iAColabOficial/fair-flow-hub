@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useUsers, useOrientadores, User } from '@/hooks/useUsers';
+import { useUsers, useOrientadores, useAutores, User } from '@/hooks/useUsers';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface UserSearchSelectProps {
@@ -15,7 +15,7 @@ interface UserSearchSelectProps {
   label?: string;
   disabled?: boolean;
   // NOVA PROP: Para especificar se é busca de orientadores
-  searchType?: 'users' | 'orientadores';
+  searchType?: 'users' | 'orientadores' | 'autores';
 }
 
 export function UserSearchSelect({
@@ -34,11 +34,15 @@ export function UserSearchSelect({
   // MODIFICAÇÃO: Usar hook apropriado baseado no searchType
   const { data: users = [], isLoading } = searchType === 'orientadores' 
     ? useOrientadores(debouncedSearch)
+    : searchType === 'autores'
+    ? useAutores(debouncedSearch)
     : useUsers(debouncedSearch);
 
   // MODIFICAÇÃO: Placeholder dinâmico baseado no tipo de busca
   const defaultPlaceholder = searchType === 'orientadores' 
     ? "Buscar orientador por CPF..." 
+    : searchType === 'autores'
+    ? "Buscar autores por CPF..."
     : "Buscar usuários...";
 
   const handleUserSelect = (user: User) => {
@@ -55,14 +59,15 @@ export function UserSearchSelect({
     onUsersChange(selectedUsers.filter(u => u.id !== userId));
   };
 
-  const availableUsers = users.filter(user => 
+  const availableUsers = users.filter((user): user is User => 
+    user && typeof user === 'object' && 'id' in user && 'nome' in user && 'email' in user && 'cpf' in user &&
     !selectedUsers.find(selected => selected.id === user.id)
   );
 
   const canAddMore = !maxUsers || selectedUsers.length < maxUsers;
 
   // MODIFICAÇÃO: Tamanho mínimo da busca baseado no tipo
-  const minSearchLength = searchType === 'orientadores' ? 3 : 2;
+  const minSearchLength = (searchType === 'orientadores' || searchType === 'autores') ? 3 : 2;
 
   return (
     <div className="space-y-3">
@@ -116,6 +121,8 @@ export function UserSearchSelect({
                   <div className="text-center py-2 text-muted-foreground">
                     {searchType === 'orientadores' 
                       ? 'Nenhum orientador encontrado' 
+                      : searchType === 'autores'
+                      ? 'Nenhum autor encontrado'
                       : 'Nenhum usuário encontrado'}
                   </div>
                 ) : (
@@ -128,14 +135,14 @@ export function UserSearchSelect({
                         className="w-full text-left p-2 rounded hover:bg-accent transition-colors"
                       >
                         <div className="font-medium">{user.nome}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {/* MODIFICAÇÃO: Mostrar CPF mascarado ou completo baseado na busca */}
-                          {searchType === 'orientadores' 
-                            ? `CPF: ${debouncedSearch && debouncedSearch.replace(/[^0-9]/g, '').length >= 11 
-                                ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
-                                : `***.***.***-${user.cpf.slice(-2)}`}`
-                            : user.email}
-                        </div>
+                          <div className="text-sm text-muted-foreground">
+                            {/* MODIFICAÇÃO: Mostrar CPF mascarado ou completo baseado na busca */}
+                            {(searchType === 'orientadores' || searchType === 'autores')
+                              ? `CPF: ${debouncedSearch && debouncedSearch.replace(/[^0-9]/g, '').length >= 11 
+                                  ? user.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+                                  : `***.***.***-${user.cpf.slice(-2)}`}`
+                              : user.email}
+                          </div>
                       </button>
                     ))}
                   </div>

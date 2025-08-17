@@ -87,7 +87,7 @@ export const useUserProfile = () => {
 
       const profileUpdateData = {
         instituicao: profileData.instituicao,
-        nivel_escolar: profileData.nivel_escolar,
+        nivel_escolar: profileData.nivel_escolar as "educacao_infantil" | "fundamental_1_3" | "fundamental_4_6" | "fundamental_7_9" | "medio" | "tecnico" | "eja" | "superior" | "pos_graduacao" | undefined,
         formacao_academica: profileData.formacao_academica,
         area_atuacao: profileData.area_atuacao,
         curriculo_lattes: profileData.curriculo_lattes,
@@ -117,7 +117,12 @@ export const useUserProfile = () => {
           .from('user_profiles')
           .insert({
             user_id: user.id,
-            ...profileUpdateData,
+            instituicao: profileUpdateData.instituicao,
+            nivel_escolar: profileUpdateData.nivel_escolar,
+            formacao_academica: profileUpdateData.formacao_academica,
+            area_atuacao: profileUpdateData.area_atuacao,
+            curriculo_lattes: profileUpdateData.curriculo_lattes,
+            updated_at: profileUpdateData.updated_at,
           });
 
         if (profileError) throw profileError;
